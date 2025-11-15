@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -6,6 +5,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 kotlin {
@@ -14,7 +14,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -24,12 +24,8 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -37,11 +33,42 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            // Koin
+            implementation(libs.bundles.common.koin)
+
+            // Lifecycle
+            implementation(libs.bundles.androidx.lifecycle.compose)
+
+            // Coroutines
+            implementation(libs.kotlinx.coroutines.core)
+
+            // Supabase
+            implementation(project.dependencies.platform(libs.supabase.bom))
+            implementation(libs.bundles.common.supabase)
+
+            // Ktor
+            implementation(libs.ktor.client.core)
+
+            // Serialization
+            implementation(libs.kotlinx.serialization.json)
         }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+        androidMain.dependencies {
+            implementation(compose.preview)
+            implementation(libs.androidx.activity.compose)
+
+            // Koin Android
+            implementation(libs.koin.android)
+
+            // Coroutines Android
+            implementation(libs.kotlinx.coroutines.android)
+
+            // Ktor
+            implementation(libs.ktor.client.okhttp)
+        }
+        iosMain.dependencies {
+            // Ktor
+            implementation(libs.ktor.client.darwin)
         }
     }
 }
@@ -76,4 +103,3 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
-
