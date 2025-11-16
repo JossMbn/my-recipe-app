@@ -9,7 +9,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         modules(
             supabaseModule,
             repositoryModule,
-            viewModelModule
+            viewModelModule,
+            mapperModule
         )
     }
 }
