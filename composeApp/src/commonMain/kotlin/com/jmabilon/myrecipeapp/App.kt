@@ -1,48 +1,35 @@
 package com.jmabilon.myrecipeapp
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.painterResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jmabilon.myrecipeapp.ui.authentication.AuthenticationNavHost
+import com.jmabilon.myrecipeapp.ui.home.HomePage
+import io.github.jan.supabase.auth.status.SessionStatus
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
-import myrecipeapp.composeapp.generated.resources.Res
-import myrecipeapp.composeapp.generated.resources.compose_multiplatform
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @Preview
-fun App() {
+fun App(viewModel: AppViewModel = koinViewModel()) {
+
+    val authStatus by viewModel.authenticationStatus.collectAsStateWithLifecycle()
+
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
+        AnimatedContent(
+            modifier = Modifier.fillMaxSize(), targetState = authStatus
+        ) { targetState ->
+            when (targetState) {
+                is SessionStatus.Authenticated -> HomePage()
+
+                is SessionStatus.NotAuthenticated,
+                is SessionStatus.RefreshFailure -> AuthenticationNavHost()
+
+                SessionStatus.Initializing -> Unit
             }
         }
     }
