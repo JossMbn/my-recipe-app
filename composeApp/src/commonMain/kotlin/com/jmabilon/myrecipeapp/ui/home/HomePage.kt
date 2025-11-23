@@ -1,8 +1,11 @@
 package com.jmabilon.myrecipeapp.ui.home
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -13,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jmabilon.myrecipeapp.ui.home.model.HomeAction
@@ -78,11 +82,13 @@ private fun HomePageContent(
     onAction: (HomeAction) -> Unit,
     navigator: HomeNavigator
 ) {
-    Box(
+    LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Text("Home Page Content")
+        items(state.recipes) { recipe ->
+            Text(text = "Recipe: ${recipe.title}", color = Color.Black)
+        }
     }
 }
 

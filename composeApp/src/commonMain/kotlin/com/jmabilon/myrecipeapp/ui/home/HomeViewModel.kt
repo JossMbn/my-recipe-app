@@ -2,25 +2,34 @@ package com.jmabilon.myrecipeapp.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jmabilon.myrecipeapp.domain.authentication.repository.RecipeRepository
 import com.jmabilon.myrecipeapp.ui.home.model.HomeAction
+import com.jmabilon.myrecipeapp.ui.home.model.HomeContentView
 import com.jmabilon.myrecipeapp.ui.home.model.HomeEvent
 import com.jmabilon.myrecipeapp.ui.home.model.HomeState
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+    recipeRepository: RecipeRepository
+) : ViewModel() {
 
     private val _event = MutableSharedFlow<HomeEvent>()
     val event = _event.asSharedFlow()
 
-    private val _state = MutableStateFlow(HomeState())
-    val state = _state
-        .onStart {
-            // Load initial data here
+    val _recipes = recipeRepository.getAllRecipes()
+
+    val state = _recipes
+        .map {
+            println("HomeViewModel: Loaded ${it.size} recipes")
+            HomeState(
+                contentView = HomeContentView.Content,
+                recipes = it
+            )
         }
         .stateIn(
             scope = viewModelScope,
@@ -34,9 +43,5 @@ class HomeViewModel : ViewModel() {
                 // Handle actions
             }
         }
-    }
-
-    private fun loadData() {
-        // ...
     }
 }
