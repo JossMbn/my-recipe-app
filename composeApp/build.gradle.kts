@@ -53,6 +53,9 @@ kotlin {
 
             // Serialization
             implementation(libs.kotlinx.serialization.json)
+
+            // Coil
+            implementation(libs.bundles.common.coil)
         }
         androidMain.dependencies {
             implementation(compose.preview)
