@@ -64,7 +64,7 @@ fun StepCreationSheet(
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
-            Text("Create Step")
+            Text("Add Step")
         }
     }
 }

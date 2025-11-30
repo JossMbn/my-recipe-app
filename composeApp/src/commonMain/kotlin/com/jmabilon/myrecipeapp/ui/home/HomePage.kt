@@ -2,10 +2,13 @@ package com.jmabilon.myrecipeapp.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.tappableElement
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -63,7 +66,10 @@ private fun HomePage(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = navigator::navigateToRecipeCreationPage) {
+            FloatingActionButton(
+                modifier = Modifier.windowInsetsPadding(WindowInsets.tappableElement),
+                onClick = navigator::navigateToRecipeCreationPage
+            ) {
                 Text(
                     modifier = Modifier.padding(horizontal = 10.dp),
                     text = "Add Recipe"
@@ -95,7 +101,7 @@ private fun HomePageContent(
             start = contentPadding.calculateStartPadding(LayoutDirection.Ltr) + 16.dp,
             end = contentPadding.calculateEndPadding(LayoutDirection.Ltr) + 16.dp,
             top = contentPadding.calculateTopPadding() + 16.dp,
-            bottom = contentPadding.calculateBottomPadding() + 16.dp
+            bottom = contentPadding.calculateBottomPadding() + 72.dp
         ),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)

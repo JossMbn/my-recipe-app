@@ -36,7 +36,7 @@ fun ExpandableRecipeContainer(
     title: String,
     content: @Composable () -> Unit
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(true) }
     val animatedRotation by animateFloatAsState(if (isExpanded) 0f else 180f)
 
     val containerShape = remember { RoundedCornerShape(10.dp) }
@@ -88,6 +88,10 @@ private fun ExpandableRecipeContainerPreview() {
         modifier = Modifier.background(Color.White).padding(10.dp),
         title = "Expandable Recipe Container"
     ) {
-        Text("This is the expanded content.")
+        Text(
+            modifier = Modifier
+                .padding(10.dp),
+            text = "This is the expanded content."
+        )
     }
 }

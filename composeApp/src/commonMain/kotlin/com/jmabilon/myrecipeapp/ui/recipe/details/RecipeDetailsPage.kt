@@ -2,16 +2,22 @@ package com.jmabilon.myrecipeapp.ui.recipe.details
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.tappableElement
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -23,6 +29,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -39,6 +49,7 @@ import com.jmabilon.myrecipeapp.ui.recipe.details.component.ExpandableRecipeCont
 import com.jmabilon.myrecipeapp.ui.recipe.details.component.RecipeImageTitle
 import com.jmabilon.myrecipeapp.ui.recipe.details.model.RecipeDetailsAction
 import com.jmabilon.myrecipeapp.ui.recipe.details.model.RecipeDetailsState
+import com.jmabilon.myrecipeapp.ui.recipe.details.sheet.CheckIngredientsAvailabilitySheet
 import myrecipeapp.composeapp.generated.resources.Res
 import myrecipeapp.composeapp.generated.resources.ic_arrow_left_alt_rounded
 import org.jetbrains.compose.resources.painterResource
@@ -68,6 +79,8 @@ private fun RecipeDetailsPage(
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
+    var isCheckIngredientsSheetOpen by remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -92,6 +105,22 @@ private fun RecipeDetailsPage(
                 scrollBehavior = scrollBehavior
             )
         },
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .windowInsetsPadding(WindowInsets.navigationBars),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(
+                    onClick = { isCheckIngredientsSheetOpen = true },
+                    contentPadding = PaddingValues(vertical = 16.dp, horizontal = 40.dp)
+                ) {
+                    Text(text = "Start cooking")
+                }
+            }
+        },
         containerColor = Color.White
     ) { innerPadding ->
         RecipeDetailsPageContent(
@@ -102,6 +131,13 @@ private fun RecipeDetailsPage(
             contentPadding = innerPadding,
             onAction = onAction,
             navigator = navigator
+        )
+    }
+
+    if (isCheckIngredientsSheetOpen) {
+        CheckIngredientsAvailabilitySheet(
+            ingredientGroups = state.recipe?.ingredientGroups.orEmpty(),
+            onDismissRequest = { isCheckIngredientsSheetOpen = false }
         )
     }
 }

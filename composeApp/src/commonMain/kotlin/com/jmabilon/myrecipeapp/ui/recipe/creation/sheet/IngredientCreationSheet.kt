@@ -73,7 +73,7 @@ fun IngredientCreationSheet(
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
-            Text("Create Group")
+            Text("Add Ingredient")
         }
     }
 }
