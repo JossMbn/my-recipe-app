@@ -2,15 +2,17 @@ package com.jmabilon.myrecipeapp.ui.recipe.creation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.IngredientDomain
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.IngredientGroupDomain
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.RecipeDomain
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.RecipeStepDomain
-import com.jmabilon.myrecipeapp.domain.authentication.repository.RecipeRepository
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientGroupDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeStepDomain
+import com.jmabilon.myrecipeapp.domain.recipe.repository.RecipeRepository
+import com.jmabilon.myrecipeapp.domain.recipe.usecase.CreateRecipeUseCase
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationAction
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationEvent
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationState
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationSteps
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,7 +26,7 @@ import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class RecipeCreationViewModel(
-    private val recipeRepository: RecipeRepository
+    private val createRecipeUseCase: CreateRecipeUseCase
 ) : ViewModel() {
 
     private val _event = MutableSharedFlow<RecipeCreationEvent>()
@@ -50,6 +52,16 @@ class RecipeCreationViewModel(
             // First Step
             is RecipeCreationAction.OnRecipeTitleChange -> {
                 _state.update { it.copy(recipeTitle = action.title) }
+            }
+
+            is RecipeCreationAction.OnRecipeImagePicked -> {
+                action.imageBytes?.let { imageBytes ->
+                    _state.update {
+                        it.copy(
+                            recipeImage = imageBytes.toImmutableList()
+                        )
+                    }
+                }
             }
 
             is RecipeCreationAction.OnValidateFirstStep -> validateFirstStep()
@@ -205,7 +217,10 @@ class RecipeCreationViewModel(
 
             pendingFinalRecipe.update { it.copy(steps = currentSteps) }
 
-            recipeRepository.createRecipe(pendingFinalRecipe.value)
+            createRecipeUseCase(
+                recipe = pendingFinalRecipe.value,
+                image = _state.value.recipeImage?.toByteArray()
+            )
                 .onSuccess {
                     _event.emit(RecipeCreationEvent.OnRecipeCreatedSuccessfully)
                 }

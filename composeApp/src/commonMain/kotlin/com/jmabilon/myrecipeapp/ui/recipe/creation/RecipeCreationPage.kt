@@ -162,7 +162,11 @@ private fun RecipeCreationPageContent(
         RecipeCreationSteps.FirstStep -> RecipeCreationFirstStepPage(
             modifier = modifier,
             title = state.recipeTitle,
+            recipeImage = state.recipeImage,
             onValueChange = { onAction(RecipeCreationAction.OnRecipeTitleChange(title = it)) },
+            onImagePicked = { byteArray ->
+                onAction(RecipeCreationAction.OnRecipeImagePicked(imageBytes = byteArray))
+            }
         )
 
         RecipeCreationSteps.SecondStep -> RecipeCreationSecondStepPage(

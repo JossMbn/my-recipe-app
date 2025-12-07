@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.jmabilon.myrecipeapp.domain.authentication.repository.RecipeRepository
+import com.jmabilon.myrecipeapp.domain.recipe.repository.RecipeRepository
 import com.jmabilon.myrecipeapp.ui.recipe.details.model.RecipeDetailsAction
 import com.jmabilon.myrecipeapp.ui.recipe.details.model.RecipeDetailsContentView
 import com.jmabilon.myrecipeapp.ui.recipe.details.model.RecipeDetailsEvent

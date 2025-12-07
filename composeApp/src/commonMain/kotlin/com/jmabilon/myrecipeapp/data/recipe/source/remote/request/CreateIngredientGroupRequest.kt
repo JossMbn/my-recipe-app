@@ -1,7 +1,7 @@
 package com.jmabilon.myrecipeapp.data.recipe.source.remote.request
 
 import com.jmabilon.myrecipeapp.core.domain.Mapper
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.IngredientGroupDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientGroupDomain
 import kotlinx.serialization.Serializable
 
 @Serializable

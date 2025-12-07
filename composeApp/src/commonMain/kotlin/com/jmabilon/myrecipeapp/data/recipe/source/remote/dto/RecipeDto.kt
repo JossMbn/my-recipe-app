@@ -1,7 +1,7 @@
 package com.jmabilon.myrecipeapp.data.recipe.source.remote.dto
 
 import com.jmabilon.myrecipeapp.core.domain.Mapper
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -30,11 +30,14 @@ class RecipeMapper() : Mapper<RecipeDomain, RecipeDto> {
     override fun convert(input: RecipeDto): RecipeDomain {
         val ingredientGroups = input.ingredientGroups.convertToDomain()
         val steps = input.steps.convertToDomain()
+        val photoUrl = input.photoUrl?.takeIf { it.isNotEmpty() }?.let { photoPath ->
+            "https://fhmtnwwllpiemdnyvirn.supabase.co/storage/v1/object/public/recipe-photos/$photoPath"
+        }
 
         return RecipeDomain(
             id = input.id,
             title = input.title,
-            photoUrl = input.photoUrl,
+            photoUrl = photoUrl,
             ingredientGroups = ingredientGroups,
             steps = steps
         )

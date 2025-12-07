@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
 import com.jmabilon.myrecipeapp.ui.home.component.HomeRecipeItem
 import com.jmabilon.myrecipeapp.ui.home.model.HomeAction
 import com.jmabilon.myrecipeapp.ui.home.model.HomeState

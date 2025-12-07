@@ -22,7 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.RecipeStepDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeStepDomain
 import myrecipeapp.composeapp.generated.resources.Res
 import myrecipeapp.composeapp.generated.resources.ic_close_rounded
 import org.jetbrains.compose.resources.painterResource

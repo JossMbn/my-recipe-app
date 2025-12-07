@@ -15,8 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.IngredientDomain
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.IngredientGroupDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientGroupDomain
 import com.jmabilon.myrecipeapp.ui.recipe.creation.components.IngredientGroupContainer
 import com.jmabilon.myrecipeapp.ui.recipe.creation.components.StepHeader
 import org.jetbrains.compose.ui.tooling.preview.Preview

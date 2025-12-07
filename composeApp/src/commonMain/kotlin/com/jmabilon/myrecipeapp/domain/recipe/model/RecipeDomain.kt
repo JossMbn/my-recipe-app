@@ -1,4 +1,4 @@
-package com.jmabilon.myrecipeapp.domain.authentication.recipe.model
+package com.jmabilon.myrecipeapp.domain.recipe.model
 
 data class RecipeDomain(
     val id: String,

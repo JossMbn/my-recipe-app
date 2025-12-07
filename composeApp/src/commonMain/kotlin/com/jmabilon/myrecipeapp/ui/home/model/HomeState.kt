@@ -1,6 +1,6 @@
 package com.jmabilon.myrecipeapp.ui.home.model
 
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

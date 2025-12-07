@@ -2,7 +2,7 @@ package com.jmabilon.myrecipeapp.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jmabilon.myrecipeapp.domain.authentication.repository.RecipeRepository
+import com.jmabilon.myrecipeapp.domain.recipe.repository.RecipeRepository
 import com.jmabilon.myrecipeapp.ui.home.model.HomeAction
 import com.jmabilon.myrecipeapp.ui.home.model.HomeContentView
 import com.jmabilon.myrecipeapp.ui.home.model.HomeEvent

@@ -7,8 +7,8 @@ import com.jmabilon.myrecipeapp.data.recipe.source.remote.dto.RecipeDto
 import com.jmabilon.myrecipeapp.data.recipe.source.remote.dto.RecipeMapper
 import com.jmabilon.myrecipeapp.data.recipe.source.remote.request.CreateRecipeRpcParams
 import com.jmabilon.myrecipeapp.data.recipe.source.remote.request.CreateRecipeToRequestMapper
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.RecipeDomain
-import com.jmabilon.myrecipeapp.domain.authentication.repository.RecipeRepository
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.repository.RecipeRepository
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns

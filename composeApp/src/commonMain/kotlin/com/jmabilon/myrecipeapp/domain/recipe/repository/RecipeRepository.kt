@@ -1,6 +1,6 @@
-package com.jmabilon.myrecipeapp.domain.authentication.repository
+package com.jmabilon.myrecipeapp.domain.recipe.repository
 
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
 import kotlinx.coroutines.flow.Flow
 
 interface RecipeRepository {

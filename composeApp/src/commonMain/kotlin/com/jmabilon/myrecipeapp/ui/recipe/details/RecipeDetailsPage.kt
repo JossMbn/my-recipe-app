@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.tappableElement
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,10 +40,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.IngredientDomain
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.IngredientGroupDomain
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.RecipeDomain
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.RecipeStepDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientGroupDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeStepDomain
 import com.jmabilon.myrecipeapp.ui.recipe.details.component.ExpandableRecipeContainer
 import com.jmabilon.myrecipeapp.ui.recipe.details.component.RecipeImageTitle
 import com.jmabilon.myrecipeapp.ui.recipe.details.model.RecipeDetailsAction

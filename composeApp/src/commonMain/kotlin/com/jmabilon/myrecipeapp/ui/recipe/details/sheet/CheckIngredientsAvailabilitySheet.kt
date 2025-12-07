@@ -22,8 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.IngredientDomain
-import com.jmabilon.myrecipeapp.domain.authentication.recipe.model.IngredientGroupDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientGroupDomain
 import com.jmabilon.myrecipeapp.ui.recipe.details.sheet.component.CheckIngredientItem
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
