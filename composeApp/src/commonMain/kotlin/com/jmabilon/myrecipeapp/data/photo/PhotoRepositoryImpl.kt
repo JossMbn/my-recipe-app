@@ -15,9 +15,8 @@ class PhotoRepositoryImpl(
     private val supabaseClient: SupabaseClient
 ) : PhotoRepository {
 
-    private val bucketName = "recipe-photos"
-
     override suspend fun uploadPhoto(
+        bucketId: String,
         photoBytes: ByteArray,
         fileName: String?
     ): Result<String> {
@@ -32,60 +31,59 @@ class PhotoRepositoryImpl(
             val filePath = "$userId/$finalFileName"
 
             // Upload vers Supabase Storage
-            storage.from(bucketName).upload(
+            storage.from(bucketId).upload(
                 path = filePath,
                 data = photoBytes,
                 options = { upsert = false }
             )
 
-            // Retourner une URL signée valide 24h
             filePath
-            /*storage.from(bucketName).createSignedUrl(
-                path = filePath,
-                expiresIn = 24.hours
-            )*/
         }
     }
 
     override suspend fun uploadPhotos(
+        bucketId: String,
         photos: List<ByteArray>
     ): Result<List<String>> = runCatching {
         photos.mapIndexed { index, photoBytes ->
             val fileName = "${Uuid.random()}_$index.jpg"
-            uploadPhoto(photoBytes, fileName).getOrThrow()
+            uploadPhoto(bucketId, photoBytes, fileName).getOrThrow()
         }
     }
 
-    override suspend fun deletePhoto(filePath: String): Result<Unit> {
+    override suspend fun deletePhoto(bucketId: String, filePath: String): Result<Unit> {
         return supabaseClient.safeExecution {
-            storage.from(bucketName).delete(filePath)
+            storage.from(bucketId).delete(filePath)
         }
     }
 
     override suspend fun updatePhoto(
+        bucketId: String,
         oldFilePath: String,
         newPhotoBytes: ByteArray
     ): Result<String> = runCatching {
         // Supprimer l'ancienne photo
-        deletePhoto(oldFilePath).getOrThrow()
+        deletePhoto(bucketId, oldFilePath).getOrThrow()
 
         // Upload la nouvelle
-        uploadPhoto(newPhotoBytes).getOrThrow()
+        uploadPhoto(bucketId, newPhotoBytes).getOrThrow()
     }
 
     override suspend fun listUserPhotos(): Result<List<PhotoInfoDomain>> {
+        val recipeBucketId = "recipe-photos"
+
         return supabaseClient.safeExecution {
             val userId = supabaseClient.auth.currentUserOrNull()?.id
                 ?: throw IllegalStateException("User must be authenticated")
 
-            val files = storage.from(bucketName).list(userId)
+            val files = storage.from(recipeBucketId).list(userId)
 
             files.map { file ->
                 val filePath = "$userId/${file.name}"
                 PhotoInfoDomain(
                     name = file.name,
                     path = filePath,
-                    signedUrl = storage.from(bucketName).createSignedUrl(
+                    signedUrl = storage.from(recipeBucketId).createSignedUrl(
                         path = filePath,
                         expiresIn = 24.hours
                     )

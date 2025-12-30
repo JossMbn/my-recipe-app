@@ -1,12 +1,11 @@
-package com.jmabilon.myrecipeapp.ui.home
+package com.jmabilon.myrecipeapp.ui.ai
 
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.jmabilon.myrecipeapp.ui.ai.AiAnalyzerRoute
+import com.jmabilon.myrecipeapp.ui.home.HomeRoute
 import com.jmabilon.myrecipeapp.ui.recipe.creation.RecipeCreationRoute
-import com.jmabilon.myrecipeapp.ui.recipe.details.RecipeDetailsRoute
 import kotlinx.serialization.Serializable
 
 // ==================================================================================
@@ -14,33 +13,32 @@ import kotlinx.serialization.Serializable
 // ==================================================================================
 
 @Serializable
-data object HomeRoute
+data object AiAnalyzerRoute
 
 // ==================================================================================
 //  Navigator
 // ==================================================================================
 
 @Stable
-interface HomeNavigator {
-    fun navigateToRecipeDetailPage(recipeId: String)
-    fun navigateToRecipeCreationPage()
-    fun navigateToRecipeAnalyzerPage()
+interface AiAnalyzerNavigator {
+    fun navigateBack()
+    fun navigateToRecipeDetails()
 }
 
-class HomeNavigatorImpl(
+class AiAnalyzerNavigatorImpl(
     private val controller: NavController? = null
-) : HomeNavigator {
+) : AiAnalyzerNavigator {
 
-    override fun navigateToRecipeDetailPage(recipeId: String) {
-        controller?.navigate(RecipeDetailsRoute(recipeId = recipeId))
+    override fun navigateBack() {
+        controller?.navigateUp()
     }
 
-    override fun navigateToRecipeCreationPage() {
-        controller?.navigate(RecipeCreationRoute())
-    }
-
-    override fun navigateToRecipeAnalyzerPage() {
-        controller?.navigate(AiAnalyzerRoute)
+    override fun navigateToRecipeDetails() {
+        controller?.navigate(RecipeCreationRoute(fromAiAnalyzer = true)) {
+            popUpTo(HomeRoute) {
+                inclusive = false
+            }
+        }
     }
 }
 
@@ -48,10 +46,10 @@ class HomeNavigatorImpl(
 //  Graph extension
 // ==================================================================================
 
-fun NavGraphBuilder.homePage(
+fun NavGraphBuilder.aiAnalyzerPage(
     controller: NavController
 ) {
-    composable<HomeRoute> {
-        HomeRoot(navigator = HomeNavigatorImpl(controller = controller))
+    composable<AiAnalyzerRoute> {
+        AiAnalyzerRoot(navigator = AiAnalyzerNavigatorImpl(controller = controller))
     }
 }

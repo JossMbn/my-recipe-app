@@ -1,6 +1,7 @@
 package com.jmabilon.myrecipeapp.di
 
 import com.jmabilon.myrecipeapp.AppViewModel
+import com.jmabilon.myrecipeapp.ui.ai.AiAnalyzerViewModel
 import com.jmabilon.myrecipeapp.ui.authentication.signin.SignInViewModel
 import com.jmabilon.myrecipeapp.ui.authentication.signup.SignUpViewModel
 import com.jmabilon.myrecipeapp.ui.home.HomeViewModel
@@ -18,4 +19,5 @@ val viewModelModule = module {
     viewModelOf(::RecipeCreationViewModel)
 
     viewModelOf(::RecipeDetailsViewModel)
+    viewModelOf(::AiAnalyzerViewModel)
 }

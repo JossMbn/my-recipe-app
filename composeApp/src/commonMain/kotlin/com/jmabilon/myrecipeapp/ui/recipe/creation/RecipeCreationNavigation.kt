@@ -10,7 +10,9 @@ import kotlinx.serialization.Serializable
 // ==================================================================================
 
 @Serializable
-data object RecipeCreationRoute
+data class RecipeCreationRoute(
+    val fromAiAnalyzer: Boolean = false
+)
 
 // ==================================================================================
 //  Navigator

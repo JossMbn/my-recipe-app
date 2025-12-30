@@ -18,13 +18,16 @@ actual fun rememberImagePicker(onImagePicked: (List<Byte>?) -> Unit): ImagePicke
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        uri?.let {
-            // Lecture du flux de données depuis l'URI
-            val inputStream = context.contentResolver.openInputStream(it)
-            val bytes = inputStream?.readBytes()?.toList()
-            inputStream?.close()
-            onImagePicked(bytes)
-        } ?: onImagePicked(null)
+        if (uri == null) {
+            onImagePicked(null)
+            return@rememberLauncherForActivityResult
+        }
+
+        // Lecture du flux de données depuis l'URI
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val bytes = inputStream?.readBytes()?.toList()
+        inputStream?.close()
+        onImagePicked(bytes)
     }
 
     return remember {
@@ -32,8 +35,8 @@ actual fun rememberImagePicker(onImagePicked: (List<Byte>?) -> Unit): ImagePicke
             override fun pickImage() {
                 // Lancement du Photo Picker
                 launcher.launch(
-                    PickVisualMediaRequest(
-                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                    input = PickVisualMediaRequest(
+                        mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
                     )
                 )
             }

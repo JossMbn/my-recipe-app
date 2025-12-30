@@ -1,12 +1,14 @@
 package com.jmabilon.myrecipeapp.ui.recipe.creation
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.jmabilon.myrecipeapp.domain.ai.repository.AiRepository
 import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientDomain
 import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientGroupDomain
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeStepDomain
-import com.jmabilon.myrecipeapp.domain.recipe.repository.RecipeRepository
 import com.jmabilon.myrecipeapp.domain.recipe.usecase.CreateRecipeUseCase
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationAction
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationEvent
@@ -26,8 +28,12 @@ import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class RecipeCreationViewModel(
-    private val createRecipeUseCase: CreateRecipeUseCase
+    savedStateHandle: SavedStateHandle,
+    private val createRecipeUseCase: CreateRecipeUseCase,
+    private val aiRepository: AiRepository
 ) : ViewModel() {
+
+    private val args = savedStateHandle.toRoute<RecipeCreationRoute>()
 
     private val _event = MutableSharedFlow<RecipeCreationEvent>()
     val event = _event.asSharedFlow()
@@ -37,7 +43,7 @@ class RecipeCreationViewModel(
     private val _state = MutableStateFlow(RecipeCreationState())
     val state = _state
         .onStart {
-            // Load initial data here
+            loadData()
         }
         .stateIn(
             scope = viewModelScope,
@@ -88,6 +94,25 @@ class RecipeCreationViewModel(
 
             is RecipeCreationAction.OnRemoveRecipeStepClick -> removeRecipeStepClick(action.stepId)
             RecipeCreationAction.OnValidateThirdStep -> validateThirdStep()
+        }
+    }
+
+    private fun loadData() {
+        if (!args.fromAiAnalyzer) return
+
+        viewModelScope.launch {
+            aiRepository.getTempRecipe()?.let { recipe ->
+                pendingFinalRecipe.update { recipe }
+
+                _state.update {
+                    it.copy(
+                        currentStep = RecipeCreationSteps.FirstStep,
+                        recipeTitle = recipe.title,
+                        ingredientGroups = recipe.ingredientGroups,
+                        steps = recipe.steps
+                    )
+                }
+            }
         }
     }
 

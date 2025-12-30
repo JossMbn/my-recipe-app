@@ -14,7 +14,7 @@ class CreateRecipeUseCase(
             return recipeRepository.createRecipe(recipe)
         }
 
-        return photoRepository.uploadPhoto(image)
+        return photoRepository.uploadPhoto("recipe-photos", image)
             .mapCatching { photoPath ->
                 val recipeWithPhoto = recipe.copy(photoUrl = photoPath)
 

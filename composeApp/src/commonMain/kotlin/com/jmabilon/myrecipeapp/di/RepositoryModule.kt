@@ -1,8 +1,10 @@
 package com.jmabilon.myrecipeapp.di
 
+import com.jmabilon.myrecipeapp.data.ai.AiRepositoryImpl
 import com.jmabilon.myrecipeapp.data.authentication.repository.AuthenticationRepositoryImpl
 import com.jmabilon.myrecipeapp.data.photo.PhotoRepositoryImpl
 import com.jmabilon.myrecipeapp.data.recipe.RecipeRepositoryImpl
+import com.jmabilon.myrecipeapp.domain.ai.repository.AiRepository
 import com.jmabilon.myrecipeapp.domain.authentication.repository.AuthenticationRepository
 import com.jmabilon.myrecipeapp.domain.photo.repository.PhotoRepository
 import com.jmabilon.myrecipeapp.domain.recipe.repository.RecipeRepository
@@ -14,4 +16,5 @@ val repositoryModule = module {
     singleOf(::AuthenticationRepositoryImpl).bind<AuthenticationRepository>()
     singleOf(::RecipeRepositoryImpl).bind<RecipeRepository>()
     singleOf(::PhotoRepositoryImpl).bind<PhotoRepository>()
+    singleOf(::AiRepositoryImpl).bind<AiRepository>()
 }

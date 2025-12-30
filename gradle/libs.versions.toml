@@ -54,6 +54,7 @@ supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "s
 supabase-postgrest = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
 supabase-storage = { module = "io.github.jan-tennert.supabase:storage-kt" }
+supabase-functions = { module = "io.github.jan-tennert.supabase:functions-kt" }
 
 # Ktor (needed for Supabase)
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -88,7 +89,8 @@ common-koin = [
 common-supabase = [
     "supabase-postgrest",
     "supabase-auth",
-    "supabase-storage"
+    "supabase-storage",
+    "supabase-functions"
 ]
 common-coil = [
     "coil-compose",

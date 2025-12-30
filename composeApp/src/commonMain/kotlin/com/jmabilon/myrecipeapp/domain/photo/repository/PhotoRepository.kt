@@ -10,7 +10,11 @@ interface PhotoRepository {
      * @param fileName Nom du fichier (optionnel, généré automatiquement si null)
      * @return URL signée de l'image uploadée (valide 24h)
      */
-    suspend fun uploadPhoto(photoBytes: ByteArray, fileName: String? = null): Result<String>
+    suspend fun uploadPhoto(
+        bucketId: String,
+        photoBytes: ByteArray,
+        fileName: String? = null
+    ): Result<String>
 
     /**
      * Upload plusieurs photos en une seule opération
@@ -19,6 +23,7 @@ interface PhotoRepository {
      * @return Liste des URLs signées des images uploadées
      */
     suspend fun uploadPhotos(
+        bucketId: String,
         photos: List<ByteArray>
     ): Result<List<String>>
 
@@ -27,7 +32,7 @@ interface PhotoRepository {
      *
      * @param filePath Chemin du fichier (format: {userId}/{fileName})
      */
-    suspend fun deletePhoto(filePath: String): Result<Unit>
+    suspend fun deletePhoto(bucketId: String, filePath: String): Result<Unit>
 
     /**
      * Met à jour une photo existante
@@ -37,6 +42,7 @@ interface PhotoRepository {
      * @return URL signée de la nouvelle photo
      */
     suspend fun updatePhoto(
+        bucketId: String,
         oldFilePath: String,
         newPhotoBytes: ByteArray
     ): Result<String>

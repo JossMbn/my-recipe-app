@@ -1,6 +1,7 @@
 package com.jmabilon.myrecipeapp.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -20,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -66,18 +68,33 @@ private fun HomePage(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
+            Column(
                 modifier = Modifier.windowInsetsPadding(WindowInsets.tappableElement),
-                onClick = navigator::navigateToRecipeCreationPage
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalAlignment = Alignment.End
             ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 10.dp),
-                    text = "Add Recipe"
-                )
+                FloatingActionButton(
+                    onClick = navigator::navigateToRecipeAnalyzerPage
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                        text = "Analyze"
+                    )
+                }
+
+                FloatingActionButton(
+                    onClick = navigator::navigateToRecipeCreationPage
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                        text = "Add Recipe"
+                    )
+                }
             }
         }
     ) { innerPadding ->
         HomePageContent(
+            modifier = Modifier.fillMaxSize(),
             contentPadding = innerPadding,
             state = state,
             onAction = onAction,

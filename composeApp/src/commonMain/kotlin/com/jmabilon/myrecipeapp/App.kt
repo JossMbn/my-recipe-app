@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.jmabilon.myrecipeapp.ui.ai.aiAnalyzerPage
 import com.jmabilon.myrecipeapp.ui.authentication.AuthenticationNavHost
 import com.jmabilon.myrecipeapp.ui.home.HomeRoute
 import com.jmabilon.myrecipeapp.ui.home.homePage
@@ -62,6 +63,7 @@ private fun MainContent() {
             homePage(controller = controller)
             recipeCreationPage(controller = controller)
             recipeDetailsPage(controller = controller)
+            aiAnalyzerPage(controller = controller)
         }
     }
 }
