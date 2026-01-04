@@ -1,7 +1,9 @@
 package com.jmabilon.myrecipeapp.data.recipe.source.remote.dto
 
 import com.jmabilon.myrecipeapp.core.domain.Mapper
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDifficulty
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeSourceType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -9,8 +11,13 @@ import kotlinx.serialization.Serializable
 data class RecipeDto(
     val id: String,
     val title: String,
-    @SerialName("photo_url") val photoUrl: String?, // URL Supabase Storage
-    @SerialName("ingredient_groups") val ingredientGroups: List<IngredientGroupDto>,
+    @SerialName("image_url") val photoUrl: String?, // URL Supabase Storage
+    @SerialName("source_url") val sourceUrl: String?,
+    @SerialName("source_type") val sourceType: String?,
+    @SerialName("prep_time_seconds") val prepTimeSeconds: Int?,
+    @SerialName("servings_base") val servingsBase: Int?,
+    @SerialName("difficulty_level") val difficulty: Int?,
+    @SerialName("recipe_ingredient_sections") val ingredientSections: List<IngredientSectionDto>,
     @SerialName("recipe_steps") val steps: List<RecipeStepDto>,
     @SerialName("created_at") val createdAt: String, // ISO 8601 timestamp
     @SerialName("updated_at") val updatedAt: String  // ISO 8601 timestamp
@@ -20,7 +27,7 @@ data class RecipeDto(
         const val supabaseColumns = """
                 *,
                 recipe_steps(*),
-                ingredient_groups(${IngredientGroupDto.supabaseColumns})
+                recipe_ingredient_sections(${IngredientSectionDto.supabaseColumns})
             """
     }
 }
@@ -28,7 +35,7 @@ data class RecipeDto(
 class RecipeMapper() : Mapper<RecipeDomain, RecipeDto> {
 
     override fun convert(input: RecipeDto): RecipeDomain {
-        val ingredientGroups = input.ingredientGroups.convertToDomain()
+        val ingredientGroups = input.ingredientSections.convertToDomain()
         val steps = input.steps.convertToDomain()
         val photoUrl = input.photoUrl?.takeIf { it.isNotEmpty() }?.let { photoPath ->
             "https://fhmtnwwllpiemdnyvirn.supabase.co/storage/v1/object/public/recipe-photos/$photoPath"
@@ -38,7 +45,12 @@ class RecipeMapper() : Mapper<RecipeDomain, RecipeDto> {
             id = input.id,
             title = input.title,
             photoUrl = photoUrl,
-            ingredientGroups = ingredientGroups,
+            sourceUrl = input.sourceUrl,
+            sourceType = RecipeSourceType.fromValue(input.sourceType),
+            prepTimeSeconds = input.prepTimeSeconds ?: 0,
+            servingsBase = input.servingsBase ?: 1,
+            difficulty = RecipeDifficulty.fromValue(input.difficulty ?: 1),
+            ingredientSections = ingredientGroups,
             steps = steps
         )
     }

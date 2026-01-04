@@ -24,12 +24,15 @@ class AiRepositoryImpl(
 
         return supabaseClient.safeExecution {
             val response = functions.invoke(
-                function = "parse-recipe",
+                function = "ai-parse-recipe-image",
                 body = body
             )
 
             aiParsedRecipeMapper.convert(response.body<AiParsedRecipeDto>())
         }
+            .onFailure {
+                println("Error analysing recipe: ${it.message}")
+            }
     }
 
     override fun getTempRecipe(): RecipeDomain? {

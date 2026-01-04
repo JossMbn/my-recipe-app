@@ -15,8 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientDomain
-import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientGroupDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeIngredientDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientSectionDomain
 import com.jmabilon.myrecipeapp.ui.recipe.creation.components.IngredientGroupContainer
 import com.jmabilon.myrecipeapp.ui.recipe.creation.components.StepHeader
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -24,7 +24,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun RecipeCreationSecondStepPage(
     modifier: Modifier = Modifier,
-    ingredientGroups: List<IngredientGroupDomain>,
+    ingredientGroups: List<IngredientSectionDomain>,
     onAddIngredientsClick: (groupId: String) -> Unit,
     onRemoveIngredientClick: (ingredientId: String, groupId: String) -> Unit,
     onAddIngredientGroupClick: () -> Unit
@@ -75,50 +75,55 @@ private fun RecipeCreationSecondStepPagePreview() {
                 .fillMaxSize()
                 .background(Color.White),
             ingredientGroups = listOf(
-                IngredientGroupDomain(
+                IngredientSectionDomain(
                     id = "0", recipeId = "r1", name = "Dough", ingredients = listOf(
-                        IngredientDomain(
+                        RecipeIngredientDomain(
                             id = "1",
-                            groupId = "g1",
+                            sectionId = "g1",
                             name = "Onion",
-                            quantity = "1 cup",
-                            unit = null,
-                            order = 0
-                        ), IngredientDomain(
+                            quantity = 1.0,
+                            unit = "cup",
+                            note = null,
+                            sortOrder = 0
+                        ), RecipeIngredientDomain(
                             id = "2",
-                            groupId = "g1",
+                            sectionId = "g1",
                             name = "sugar",
-                            quantity = "50",
+                            quantity = 50.0,
                             unit = "g",
-                            order = 1
-                        ), IngredientDomain(
+                            note = null,
+                            sortOrder = 1
+                        ), RecipeIngredientDomain(
                             id = "3",
-                            groupId = "g1",
+                            sectionId = "g1",
                             name = "flour",
-                            quantity = "200",
+                            quantity = 200.0,
                             unit = "g",
-                            order = 2
+                            note = null,
+                            sortOrder = 2
                         )
-                    ), order = 0
+                    ), sortOrder = 0
                 ),
-                IngredientGroupDomain(
+                IngredientSectionDomain(
                     id = "1", recipeId = "r1", name = "Topping", ingredients = listOf(
-                        IngredientDomain(
+                        RecipeIngredientDomain(
                             id = "1",
-                            groupId = "g1",
+                            sectionId = "g1",
                             name = "parmesan cheese",
-                            quantity = "1",
+                            quantity = 1.0,
                             unit = "cup",
-                            order = 0
-                        ), IngredientDomain(
+                            note = null,
+                            sortOrder = 0
+                        ), RecipeIngredientDomain(
                             id = "2",
-                            groupId = "g1",
+                            sectionId = "g1",
                             name = "chocolat",
-                            quantity = "1",
+                            quantity = 1.0,
                             unit = "cup",
-                            order = 1
+                            note = null,
+                            sortOrder = 1
                         )
-                    ), order = 1
+                    ), sortOrder = 1
                 ),
             ),
             onAddIngredientsClick = { /* no-op */ },

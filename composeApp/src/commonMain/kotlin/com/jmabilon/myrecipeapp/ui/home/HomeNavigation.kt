@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import com.jmabilon.myrecipeapp.ui.ai.AiAnalyzerRoute
 import com.jmabilon.myrecipeapp.ui.recipe.creation.RecipeCreationRoute
 import com.jmabilon.myrecipeapp.ui.recipe.details.RecipeDetailsRoute
+import com.jmabilon.myrecipeapp.ui.search.SearchRoute
 import kotlinx.serialization.Serializable
 
 // ==================================================================================
@@ -25,6 +26,7 @@ interface HomeNavigator {
     fun navigateToRecipeDetailPage(recipeId: String)
     fun navigateToRecipeCreationPage()
     fun navigateToRecipeAnalyzerPage()
+    fun navigateToSearchPage()
 }
 
 class HomeNavigatorImpl(
@@ -41,6 +43,10 @@ class HomeNavigatorImpl(
 
     override fun navigateToRecipeAnalyzerPage() {
         controller?.navigate(AiAnalyzerRoute)
+    }
+
+    override fun navigateToSearchPage() {
+        controller?.navigate(SearchRoute)
     }
 }
 

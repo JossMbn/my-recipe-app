@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.stateIn
 
 class RecipeDetailsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val recipeRepository: RecipeRepository
+    recipeRepository: RecipeRepository
 ) : ViewModel() {
 
     private val args = savedStateHandle.toRoute<RecipeDetailsRoute>()

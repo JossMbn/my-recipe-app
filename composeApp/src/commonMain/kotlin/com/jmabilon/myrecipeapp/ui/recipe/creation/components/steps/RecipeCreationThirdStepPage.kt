@@ -75,16 +75,14 @@ private fun RecipeCreationThirdStepPagePreview() {
                 RecipeStepDomain(
                     id = "step1",
                     recipeId = "recipe1",
-                    order = 1,
-                    description = "Mix all ingredients together in a bowl.",
-                    durationMinutes = 10
+                    sortOrder = 1,
+                    instructions = "Mix all ingredients together in a bowl."
                 ),
                 RecipeStepDomain(
                     id = "step2",
                     recipeId = "recipe1",
-                    order = 2,
-                    description = "Bake in the oven at 180°C for 25 minutes.",
-                    durationMinutes = 25
+                    sortOrder = 2,
+                    instructions = "Bake in the oven at 180°C for 25 minutes."
                 )
             ),
             onAddStepClick = {},

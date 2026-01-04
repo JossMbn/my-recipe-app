@@ -54,5 +54,8 @@ class RecipeRepositoryImpl(
             .onSuccess {
                 _recipes.update { recipes -> listOf(it) + recipes }
             }
+            .onFailure {
+                println("Error creating recipe: ${it.message}")
+            }
     }
 }
