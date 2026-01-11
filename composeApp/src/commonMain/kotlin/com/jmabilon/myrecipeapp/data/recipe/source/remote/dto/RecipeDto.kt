@@ -17,8 +17,8 @@ data class RecipeDto(
     @SerialName("prep_time_seconds") val prepTimeSeconds: Int?,
     @SerialName("servings_base") val servingsBase: Int?,
     @SerialName("difficulty_level") val difficulty: Int?,
-    @SerialName("recipe_ingredient_sections") val ingredientSections: List<IngredientSectionDto>,
-    @SerialName("recipe_steps") val steps: List<RecipeStepDto>,
+    @SerialName("recipe_ingredient_sections") val ingredientSections: List<IngredientSectionDto> = emptyList(),
+    @SerialName("recipe_steps") val steps: List<RecipeStepDto> = emptyList(),
     @SerialName("created_at") val createdAt: String, // ISO 8601 timestamp
     @SerialName("updated_at") val updatedAt: String  // ISO 8601 timestamp
 ) {

@@ -11,27 +11,30 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    recipeRepository: RecipeRepository
+    private val recipeRepository: RecipeRepository
 ) : ViewModel() {
 
     private val _event = MutableSharedFlow<HomeEvent>()
     val event = _event.asSharedFlow()
 
-    val _recipes = recipeRepository.recipes
+    private val _recipes = recipeRepository.recipes
+    private val _recipeCollections = recipeRepository.recipeCollections
 
-    val state = _recipes
-        .map {
-            HomeState(
-                contentView = HomeContentView.Content,
-                recipes = it.toPersistentList()
-            )
-        }
+    val state = _recipes.combine(_recipeCollections) { recipes, recipeCollections ->
+        HomeState(
+            contentView = HomeContentView.Content,
+            recipes = recipes.toPersistentList(),
+            recipeCollections = recipeCollections.toPersistentList()
+        )
+    }
         .onStart {
+            recipeRepository.getRecipeCollections()
             recipeRepository.getAllRecipes()
         }
         .stateIn(
@@ -42,9 +45,13 @@ class HomeViewModel(
 
     fun onAction(action: HomeAction) {
         when (action) {
-            else -> {
-                // Handle actions
-            }
+            is HomeAction.CreateRecipeCollection -> createCollection(action.name)
+        }
+    }
+
+    private fun createCollection(name: String) {
+        viewModelScope.launch {
+            recipeRepository.createCollection(name)
         }
     }
 }

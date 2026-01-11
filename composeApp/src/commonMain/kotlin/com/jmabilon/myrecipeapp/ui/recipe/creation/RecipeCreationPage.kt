@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jmabilon.myrecipeapp.core.prensentation.extension.clearFocusOnTap
 import com.jmabilon.myrecipeapp.core.prensentation.extension.collectAsEvents
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeCollectionDomain
 import com.jmabilon.myrecipeapp.ui.recipe.creation.components.steps.RecipeCreationFirstStepPage
 import com.jmabilon.myrecipeapp.ui.recipe.creation.components.steps.RecipeCreationSecondStepPage
 import com.jmabilon.myrecipeapp.ui.recipe.creation.components.steps.RecipeCreationThirdStepPage
@@ -31,9 +32,11 @@ import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationAction
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationEvent
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationState
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationSteps
+import com.jmabilon.myrecipeapp.ui.recipe.creation.sheet.CollectionsSheet
 import com.jmabilon.myrecipeapp.ui.recipe.creation.sheet.GroupCreationSheet
 import com.jmabilon.myrecipeapp.ui.recipe.creation.sheet.IngredientCreationSheet
 import com.jmabilon.myrecipeapp.ui.recipe.creation.sheet.StepCreationSheet
+import kotlinx.collections.immutable.toImmutableList
 import myrecipeapp.composeapp.generated.resources.Res
 import myrecipeapp.composeapp.generated.resources.ic_arrow_left_alt_rounded
 import org.jetbrains.compose.resources.painterResource
@@ -157,15 +160,20 @@ private fun RecipeCreationPageContent(
     var pendingGroupId by remember { mutableStateOf<String?>(null) }
     var isIngredientCreationSheetVisible by remember { mutableStateOf(false) }
     var isStepCreationSheetVisible by remember { mutableStateOf(false) }
+    var isCollectionsSheetVisible by remember { mutableStateOf(false) }
 
     when (state.currentStep) {
         RecipeCreationSteps.FirstStep -> RecipeCreationFirstStepPage(
             modifier = modifier,
             title = state.recipeTitle,
             recipeImage = state.recipeImage,
+            selectedCollectionName = state.selectedCollection?.name,
             onValueChange = { onAction(RecipeCreationAction.OnRecipeTitleChange(title = it)) },
             onImagePicked = { byteArray ->
                 onAction(RecipeCreationAction.OnRecipeImagePicked(imageBytes = byteArray))
+            },
+            onRecipeCollectionClicked = {
+                isCollectionsSheetVisible = true
             }
         )
 
@@ -238,6 +246,16 @@ private fun RecipeCreationPageContent(
                     )
                 )
                 isStepCreationSheetVisible = false
+            }
+        )
+    }
+
+    if (isCollectionsSheetVisible) {
+        CollectionsSheet(
+            onDismissRequest = { isCollectionsSheetVisible = false },
+            collections = state.recipeCollections,
+            onSelectCollection = { collectionId ->
+                onAction(RecipeCreationAction.OnSelectRecipeCollection(collectionId = collectionId))
             }
         )
     }

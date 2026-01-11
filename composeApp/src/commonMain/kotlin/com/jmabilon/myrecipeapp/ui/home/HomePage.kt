@@ -1,11 +1,9 @@
 package com.jmabilon.myrecipeapp.ui.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -14,28 +12,33 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.tappableElement
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDifficulty
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeSourceType
+import com.jmabilon.myrecipeapp.ui.home.component.HomeCollectionItem
 import com.jmabilon.myrecipeapp.ui.home.component.HomeRecipeItem
 import com.jmabilon.myrecipeapp.ui.home.model.HomeAction
 import com.jmabilon.myrecipeapp.ui.home.model.HomeState
@@ -73,6 +76,11 @@ private fun HomePage(
                         text = "Home",
                         style = MaterialTheme.typography.headlineSmall
                     )
+                },
+                actions = {
+                    IconButton(onClick = { navigator.navigateToSearchPage() }) {
+                        Text(text = "⋮")
+                    }
                 }
             )
         },
@@ -120,7 +128,7 @@ private fun HomePageContent(
     onAction: (HomeAction) -> Unit,
     navigator: HomeNavigator
 ) {
-    val searchBarShape = remember { RoundedCornerShape(4.dp) }
+    val collectionCreationText = remember { mutableStateOf("") }
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -131,22 +139,42 @@ private fun HomePageContent(
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                value = collectionCreationText.value,
+                onValueChange = { collectionCreationText.value = it },
+                label = { Text("Create New Collection") }
+            )
+
+            Button(
+                onClick = {
+                    onAction(HomeAction.CreateRecipeCollection(collectionCreationText.value))
+                    collectionCreationText.value = ""
+                }
+            ) { Text("Create") }
+        }
+
+        LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .clip(shape = searchBarShape)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = searchBarShape
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(state.recipeCollections) { recipeCollection ->
+                HomeCollectionItem(
+                    firstUrl = recipeCollection.previewImages.getOrNull(0),
+                    secondUrl = recipeCollection.previewImages.getOrNull(1),
+                    thirdUrl = recipeCollection.previewImages.getOrNull(2),
+                    collectionName = recipeCollection.name,
+                    recipeCount = recipeCollection.recipeCount,
                 )
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .clickable { navigator.navigateToSearchPage() }
-                .padding(12.dp),
-            text = "search bar placeholder"
-        )
+            }
+        }
 
         LazyVerticalGrid(
             modifier = modifier.fillMaxSize(),

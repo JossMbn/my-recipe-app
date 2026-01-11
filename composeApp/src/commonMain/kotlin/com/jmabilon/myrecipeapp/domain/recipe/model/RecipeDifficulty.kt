@@ -1,7 +1,6 @@
 package com.jmabilon.myrecipeapp.domain.recipe.model
 
 enum class RecipeDifficulty {
-    VeryEasy,
     Easy,
     Medium,
     Hard,
@@ -10,11 +9,10 @@ enum class RecipeDifficulty {
 
     companion object {
         fun fromValue(value: Int?): RecipeDifficulty = when (value) {
-            1 -> VeryEasy
-            2 -> Easy
-            3 -> Medium
-            4 -> Hard
-            5 -> Expert
+            1 -> Easy
+            2 -> Medium
+            3 -> Hard
+            4 -> Expert
             else -> Unknown
         }
     }

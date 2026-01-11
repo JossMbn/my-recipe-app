@@ -11,7 +11,9 @@ import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeIngredientDomain
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeSourceType
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeStepDomain
+import com.jmabilon.myrecipeapp.domain.recipe.repository.RecipeRepository
 import com.jmabilon.myrecipeapp.domain.recipe.usecase.CreateRecipeUseCase
+import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCollectionItem
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationAction
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationEvent
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationState
@@ -21,6 +23,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -32,7 +36,8 @@ import kotlin.uuid.Uuid
 class RecipeCreationViewModel(
     savedStateHandle: SavedStateHandle,
     private val createRecipeUseCase: CreateRecipeUseCase,
-    private val aiRepository: AiRepository
+    private val aiRepository: AiRepository,
+    recipeRepository: RecipeRepository
 ) : ViewModel() {
 
     private val args = savedStateHandle.toRoute<RecipeCreationRoute>()
@@ -41,9 +46,29 @@ class RecipeCreationViewModel(
     val event = _event.asSharedFlow()
 
     private val pendingFinalRecipe = MutableStateFlow(createEmptyRecipe())
+    private val _recipeCollections = recipeRepository.recipeCollections.map { recipeCollections ->
+        recipeCollections
+            .filter { !it.isUncategorized }
+            .map { collection ->
+                RecipeCollectionItem(
+                    id = collection.id,
+                    name = collection.name
+                )
+            }.toImmutableList()
+    }
+    private val _selectedRecipeCollectionId = MutableStateFlow<String?>(null)
 
     private val _state = MutableStateFlow(RecipeCreationState())
-    val state = _state
+    val state = combine(
+        _state,
+        _recipeCollections,
+        _selectedRecipeCollectionId
+    ) { state, collections, selectedRecipeCollectionId ->
+        state.copy(
+            recipeCollections = collections,
+            selectedCollectionId = selectedRecipeCollectionId
+        )
+    }
         .onStart {
             loadData()
         }
@@ -70,6 +95,10 @@ class RecipeCreationViewModel(
                         )
                     }
                 }
+            }
+
+            is RecipeCreationAction.OnSelectRecipeCollection -> {
+                _selectedRecipeCollectionId.update { action.collectionId }
             }
 
             is RecipeCreationAction.OnValidateFirstStep -> validateFirstStep()
@@ -241,7 +270,8 @@ class RecipeCreationViewModel(
 
             createRecipeUseCase(
                 recipe = pendingFinalRecipe.value,
-                image = _state.value.recipeImage?.toByteArray()
+                image = _state.value.recipeImage?.toByteArray(),
+                collectionId = state.value.selectedCollectionId
             )
                 .onSuccess {
                     _event.emit(RecipeCreationEvent.OnRecipeCreatedSuccessfully)
