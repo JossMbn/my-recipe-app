@@ -9,16 +9,20 @@ class CreateRecipeUseCase(
     private val recipeRepository: RecipeRepository
 ) {
 
-    suspend operator fun invoke(recipe: RecipeDomain, image: ByteArray?): Result<RecipeDomain> {
+    suspend operator fun invoke(
+        recipe: RecipeDomain,
+        image: ByteArray?,
+        collectionId: String?
+    ): Result<RecipeDomain> {
         if (image == null) {
-            return recipeRepository.createRecipe(recipe)
+            return recipeRepository.createRecipe(recipe, collectionId)
         }
 
         return photoRepository.uploadPhoto("recipe-photos", image)
             .mapCatching { photoPath ->
                 val recipeWithPhoto = recipe.copy(photoUrl = photoPath)
 
-                recipeRepository.createRecipe(recipeWithPhoto).getOrThrow()
+                recipeRepository.createRecipe(recipeWithPhoto, collectionId).getOrThrow()
             }
     }
 }

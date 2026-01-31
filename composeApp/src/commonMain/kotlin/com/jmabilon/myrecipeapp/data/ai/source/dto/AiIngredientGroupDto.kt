@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AiIngredientGroupDto(
-    val name: String?,
-    val ingredients: List<AiIngredientDto>
+    val name: String? = null,
+    val ingredients: List<AiIngredientDto>,
+    val sortOrder: Int,
 )

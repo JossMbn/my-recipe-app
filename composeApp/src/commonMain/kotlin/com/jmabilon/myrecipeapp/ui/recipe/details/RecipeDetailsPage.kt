@@ -40,9 +40,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientDomain
-import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientGroupDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientSectionDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDifficulty
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeIngredientDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeSourceType
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeStepDomain
 import com.jmabilon.myrecipeapp.ui.recipe.details.component.ExpandableRecipeContainer
 import com.jmabilon.myrecipeapp.ui.recipe.details.component.RecipeImageTitle
@@ -135,7 +137,7 @@ private fun RecipeDetailsPage(
 
     if (isCheckIngredientsSheetOpen) {
         CheckIngredientsAvailabilitySheet(
-            ingredientGroups = state.recipe?.ingredientGroups.orEmpty(),
+            ingredientGroups = state.recipe?.ingredientSections.orEmpty(),
             onDismissRequest = { isCheckIngredientsSheetOpen = false }
         )
     }
@@ -176,7 +178,7 @@ private fun RecipeDetailsPageContent(
                     modifier = Modifier.padding(10.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    state.recipe?.ingredientGroups?.forEach { group ->
+                    state.recipe?.ingredientSections?.forEach { group ->
                         Column(
                             verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
@@ -230,7 +232,7 @@ private fun RecipeDetailsPageContent(
                                         shape = RoundedCornerShape(100.dp)
                                     )
                                     .padding(vertical = 4.dp, horizontal = 10.dp),
-                                text = "Step ${step.order}",
+                                text = "Step ${step.sortOrder}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.Black,
                                 fontWeight = FontWeight.SemiBold
@@ -238,7 +240,7 @@ private fun RecipeDetailsPageContent(
 
                             Text(
                                 modifier = Modifier.padding(10.dp),
-                                text = step.description,
+                                text = step.instructions,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.Black
                             )
@@ -260,60 +262,65 @@ private fun RecipeDetailsPagePreview() {
                     id = "1",
                     title = "Delicious Pancakes",
                     photoUrl = null,
-                    ingredientGroups = listOf(
-                        IngredientGroupDomain(
+                    ingredientSections = listOf(
+                        IngredientSectionDomain(
                             id = "group1",
                             recipeId = "1",
                             name = "Batter",
-                            order = 0,
+                            sortOrder = 0,
                             ingredients = listOf(
-                                IngredientDomain(
+                                RecipeIngredientDomain(
                                     id = "ing1",
                                     name = "All-purpose flour",
-                                    quantity = "1 1/2 cups",
-                                    groupId = "group1",
+                                    quantity = 0.5,
+                                    sectionId = "group1",
                                     unit = null,
-                                    order = 0,
+                                    note = null,
+                                    sortOrder = 0,
                                 ),
-                                IngredientDomain(
+                                RecipeIngredientDomain(
                                     id = "ing2",
                                     name = "Sugar",
-                                    quantity = "2 tablespoons",
-                                    groupId = "group1",
+                                    quantity = 2.0,
+                                    sectionId = "group1",
                                     unit = null,
-                                    order = 1
+                                    note = null,
+                                    sortOrder = 1
                                 ),
-                                IngredientDomain(
+                                RecipeIngredientDomain(
                                     id = "ing3",
                                     name = "Baking powder",
-                                    quantity = "2 teaspoons",
-                                    groupId = "group1",
+                                    quantity = 2.0,
+                                    sectionId = "group1",
                                     unit = null,
-                                    order = 2
+                                    note = null,
+                                    sortOrder = 2
                                 )
                             )
                         ),
-                        IngredientGroupDomain(
+                        IngredientSectionDomain(
                             id = "group2",
                             recipeId = "1",
                             name = "Toppings",
-                            order = 1,
+                            sortOrder = 1,
                             ingredients = listOf(
-                                IngredientDomain(
+                                RecipeIngredientDomain(
                                     id = "ing4",
+                                    sectionId = "group2",
                                     name = "Maple syrup",
-                                    quantity = "To taste",
-                                    groupId = "group2",
+                                    quantity = 2.0,
                                     unit = null,
-                                    order = 0
+                                    note = null,
+                                    sortOrder = 0
                                 ),
-                                IngredientDomain(
+                                RecipeIngredientDomain(
                                     id = "ing5",
+                                    sectionId = "group2",
                                     name = "Fresh berries",
-                                    quantity = "To taste",
-                                    groupId = "group2",
+                                    quantity = 2.0,
                                     unit = null,
-                                    order = 1
+                                    note = null,
+                                    sortOrder = 1
                                 )
                             )
                         )
@@ -321,19 +328,28 @@ private fun RecipeDetailsPagePreview() {
                     steps = listOf(
                         RecipeStepDomain(
                             id = "step1",
-                            order = 0,
-                            description = "In a large bowl, whisk together the flour, sugar, baking powder, baking soda, and salt.",
                             recipeId = "1",
-                            durationMinutes = null
+                            instructions = "In a large bowl, whisk together the flour, sugar, baking powder, baking soda, and salt.",
+                            timerSeconds = null,
+                            cookTimeSeconds = null,
+                            cookTemperature = null,
+                            sortOrder = 0
                         ),
                         RecipeStepDomain(
                             id = "step2",
-                            order = 1,
-                            description = "In another bowl, whisk together the buttermilk, egg, and melted butter.",
                             recipeId = "1",
-                            durationMinutes = null
+                            instructions = "In another bowl, whisk together the buttermilk, egg, and melted butter.",
+                            timerSeconds = null,
+                            cookTimeSeconds = null,
+                            cookTemperature = null,
+                            sortOrder = 1
                         )
-                    )
+                    ),
+                    sourceUrl = null,
+                    sourceType = RecipeSourceType.Manual,
+                    prepTimeSeconds = 3600,
+                    servingsBase = 4,
+                    difficulty = RecipeDifficulty.Medium
                 )
             ),
             onAction = { /* no-op */ },

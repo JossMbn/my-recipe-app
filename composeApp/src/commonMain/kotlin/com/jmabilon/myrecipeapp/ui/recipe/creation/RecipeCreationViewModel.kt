@@ -5,11 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.jmabilon.myrecipeapp.domain.ai.repository.AiRepository
-import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientDomain
-import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientGroupDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientSectionDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDifficulty
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeIngredientDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeSourceType
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeStepDomain
+import com.jmabilon.myrecipeapp.domain.recipe.repository.RecipeRepository
 import com.jmabilon.myrecipeapp.domain.recipe.usecase.CreateRecipeUseCase
+import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCollectionItem
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationAction
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationEvent
 import com.jmabilon.myrecipeapp.ui.recipe.creation.model.RecipeCreationState
@@ -19,6 +23,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -30,7 +36,8 @@ import kotlin.uuid.Uuid
 class RecipeCreationViewModel(
     savedStateHandle: SavedStateHandle,
     private val createRecipeUseCase: CreateRecipeUseCase,
-    private val aiRepository: AiRepository
+    private val aiRepository: AiRepository,
+    recipeRepository: RecipeRepository
 ) : ViewModel() {
 
     private val args = savedStateHandle.toRoute<RecipeCreationRoute>()
@@ -39,9 +46,29 @@ class RecipeCreationViewModel(
     val event = _event.asSharedFlow()
 
     private val pendingFinalRecipe = MutableStateFlow(createEmptyRecipe())
+    private val _recipeCollections = recipeRepository.recipeCollections.map { recipeCollections ->
+        recipeCollections
+            .filter { !it.isUncategorized }
+            .map { collection ->
+                RecipeCollectionItem(
+                    id = collection.id,
+                    name = collection.name
+                )
+            }.toImmutableList()
+    }
+    private val _selectedRecipeCollectionId = MutableStateFlow<String?>(null)
 
     private val _state = MutableStateFlow(RecipeCreationState())
-    val state = _state
+    val state = combine(
+        _state,
+        _recipeCollections,
+        _selectedRecipeCollectionId
+    ) { state, collections, selectedRecipeCollectionId ->
+        state.copy(
+            recipeCollections = collections,
+            selectedCollectionId = selectedRecipeCollectionId
+        )
+    }
         .onStart {
             loadData()
         }
@@ -70,13 +97,17 @@ class RecipeCreationViewModel(
                 }
             }
 
+            is RecipeCreationAction.OnSelectRecipeCollection -> {
+                _selectedRecipeCollectionId.update { action.collectionId }
+            }
+
             is RecipeCreationAction.OnValidateFirstStep -> validateFirstStep()
 
             // Second Step
             is RecipeCreationAction.OnAddIngredientClick -> addIngredientToGroup(
                 action.groupId,
                 action.ingredientName,
-                action.ingredientQuantity,
+                action.ingredientQuantity.toDoubleOrNull(),
                 action.ingredientUnit
             )
 
@@ -87,10 +118,7 @@ class RecipeCreationViewModel(
             )
 
             RecipeCreationAction.OnValidateSecondStep -> validateSecondStep()
-            is RecipeCreationAction.OnAddRecipeStepClick -> addRecipeStepClick(
-                action.stepDescription,
-                action.durationInMinutes
-            )
+            is RecipeCreationAction.OnAddRecipeStepClick -> addRecipeStepClick(action.stepDescription)
 
             is RecipeCreationAction.OnRemoveRecipeStepClick -> removeRecipeStepClick(action.stepId)
             RecipeCreationAction.OnValidateThirdStep -> validateThirdStep()
@@ -108,7 +136,7 @@ class RecipeCreationViewModel(
                     it.copy(
                         currentStep = RecipeCreationSteps.FirstStep,
                         recipeTitle = recipe.title,
-                        ingredientGroups = recipe.ingredientGroups,
+                        ingredientGroups = recipe.ingredientSections,
                         steps = recipe.steps
                     )
                 }
@@ -142,7 +170,7 @@ class RecipeCreationViewModel(
     private fun addIngredientToGroup(
         groupId: String,
         ingredientName: String,
-        ingredientQuantity: String,
+        ingredientQuantity: Double?,
         ingredientUnit: String
     ) {
         viewModelScope.launch {
@@ -151,9 +179,10 @@ class RecipeCreationViewModel(
             val newIngredient = createEmptyIngredient(
                 groupId = groupId,
                 name = ingredientName,
-                quantity = ingredientQuantity.ifBlank { null },
+                quantity = ingredientQuantity,
                 unit = ingredientUnit.ifBlank { null },
-                order = newIngredientOrder
+                note = null,
+                sortOrder = newIngredientOrder
             )
 
             val newIngredientGroups = state.value.ingredientGroups.map { group ->
@@ -201,7 +230,7 @@ class RecipeCreationViewModel(
         viewModelScope.launch {
             val currentIngredientGroups = _state.value.ingredientGroups.ifEmpty { return@launch }
 
-            pendingFinalRecipe.update { it.copy(ingredientGroups = currentIngredientGroups) }
+            pendingFinalRecipe.update { it.copy(ingredientSections = currentIngredientGroups) }
             _state.update { it.copy(currentStep = RecipeCreationSteps.ThirdStep) }
         }
     }
@@ -209,13 +238,10 @@ class RecipeCreationViewModel(
     // Third Step
 
     private fun addRecipeStepClick(
-        stepDescription: String,
-        durationInMinutes: String?
+        stepDescription: String
     ) {
-        val durationInMinutes = durationInMinutes?.toIntOrNull()
         val newStep = createEmptyRecipeStep(
             description = stepDescription,
-            durationInMinutes = durationInMinutes,
             order = _state.value.steps.size + 1
         )
 
@@ -244,7 +270,8 @@ class RecipeCreationViewModel(
 
             createRecipeUseCase(
                 recipe = pendingFinalRecipe.value,
-                image = _state.value.recipeImage?.toByteArray()
+                image = _state.value.recipeImage?.toByteArray(),
+                collectionId = state.value.selectedCollectionId
             )
                 .onSuccess {
                     _event.emit(RecipeCreationEvent.OnRecipeCreatedSuccessfully)
@@ -261,43 +288,48 @@ class RecipeCreationViewModel(
         id = Uuid.random().toString(),
         title = "",
         photoUrl = null,
-        ingredientGroups = emptyList(),
-        steps = emptyList()
+        ingredientSections = emptyList(),
+        steps = emptyList(),
+        sourceUrl = null,
+        sourceType = RecipeSourceType.Manual,
+        prepTimeSeconds = 0,
+        servingsBase = 1,
+        difficulty = RecipeDifficulty.Unknown
     )
 
-    private fun createEmptyIngredientGroup(groupName: String, order: Int): IngredientGroupDomain =
-        IngredientGroupDomain(
+    private fun createEmptyIngredientGroup(groupName: String, order: Int): IngredientSectionDomain =
+        IngredientSectionDomain(
             id = Uuid.random().toString(),
             recipeId = pendingFinalRecipe.value.id,
             name = groupName,
             ingredients = emptyList(),
-            order = order
+            sortOrder = order
         )
 
     private fun createEmptyIngredient(
         groupId: String,
         name: String,
-        quantity: String?,
+        quantity: Double?,
         unit: String?,
-        order: Int
-    ): IngredientDomain = IngredientDomain(
+        note: String?,
+        sortOrder: Int
+    ): RecipeIngredientDomain = RecipeIngredientDomain(
         id = Uuid.random().toString(),
-        groupId = groupId,
+        sectionId = groupId,
         name = name,
         quantity = quantity,
         unit = unit,
-        order = order
+        note = note,
+        sortOrder = sortOrder
     )
 
     private fun createEmptyRecipeStep(
         description: String,
-        durationInMinutes: Int?,
         order: Int
     ): RecipeStepDomain = RecipeStepDomain(
         id = Uuid.random().toString(),
         recipeId = pendingFinalRecipe.value.id,
-        description = description,
-        durationMinutes = durationInMinutes,
-        order = order
+        instructions = description,
+        sortOrder = order
     )
 }

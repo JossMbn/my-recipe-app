@@ -85,12 +85,12 @@ fun StepContainer(
         ) {
             StepSubContainer(
                 title = "Duration",
-                description = "${step.durationMinutes} minutes"
+                description = "${step.timerSeconds} minutes"
             )
 
             StepSubContainer(
                 title = "Description",
-                description = step.description
+                description = step.instructions
             )
         }
     }
@@ -134,9 +134,8 @@ private fun StepContainerPreview() {
             step = RecipeStepDomain(
                 id = "s1",
                 recipeId = "r1",
-                description = "Mix all the ingredients together to form a smooth dough.",
-                order = 0,
-                durationMinutes = 15
+                instructions = "Mix all the ingredients together to form a smooth dough.",
+                sortOrder = 0
             ),
             onRemoveStepClick = { /* no-op */ }
         )

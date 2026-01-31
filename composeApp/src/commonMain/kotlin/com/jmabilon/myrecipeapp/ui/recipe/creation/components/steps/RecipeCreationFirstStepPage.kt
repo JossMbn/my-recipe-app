@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -32,10 +35,19 @@ fun RecipeCreationFirstStepPage(
     modifier: Modifier = Modifier,
     title: String,
     recipeImage: ImmutableList<Byte>? = null,
+    selectedCollectionName: String? = null,
     onValueChange: (String) -> Unit,
-    onImagePicked: (List<Byte>?) -> Unit
+    onImagePicked: (List<Byte>?) -> Unit,
+    onRecipeCollectionClicked: () -> Unit
 ) {
     val imagePicker = rememberImagePicker(onImagePicked = onImagePicked)
+    val collectionTextFormatted = remember(selectedCollectionName) {
+        if (selectedCollectionName != null) {
+            "Selected Collection: $selectedCollectionName"
+        } else {
+            "Select Recipe Collection"
+        }
+    }
 
     Column(
         modifier = modifier
@@ -54,6 +66,7 @@ fun RecipeCreationFirstStepPage(
                 contentDescription = "Recipe Image",
                 modifier = Modifier
                     .fillMaxWidth()
+                    .heightIn(max = 160.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
                     .clickable { imagePicker.pickImage() }
@@ -70,6 +83,13 @@ fun RecipeCreationFirstStepPage(
             onValueChange = onValueChange,
             label = { Text("Title") }
         )
+
+        Button(
+            onClick = onRecipeCollectionClicked,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(collectionTextFormatted)
+        }
     }
 }
 
@@ -83,7 +103,8 @@ private fun RecipeCreationFirstStepPagePreview() {
             modifier = Modifier.background(MaterialTheme.colorScheme.background),
             title = title,
             onValueChange = { title = it },
-            onImagePicked = { /* no-op */ }
+            onImagePicked = { /* no-op */ },
+            onRecipeCollectionClicked = { /* no-op */ }
         )
     }
 }

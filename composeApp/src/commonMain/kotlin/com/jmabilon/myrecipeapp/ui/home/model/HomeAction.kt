@@ -1,5 +1,5 @@
 package com.jmabilon.myrecipeapp.ui.home.model
 
 sealed interface HomeAction {
-    // viewModel actions
+    data class CreateRecipeCollection(val name: String) : HomeAction
 }

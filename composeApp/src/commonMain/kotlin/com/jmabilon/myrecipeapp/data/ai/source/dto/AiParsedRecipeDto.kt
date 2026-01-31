@@ -1,9 +1,11 @@
 package com.jmabilon.myrecipeapp.data.ai.source.dto
 
 import com.jmabilon.myrecipeapp.core.domain.Mapper
-import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientDomain
-import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientGroupDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientSectionDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDifficulty
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeIngredientDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeSourceType
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeStepDomain
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -11,7 +13,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AiParsedRecipeDto(
     val title: String,
-    @SerialName("ingredientGroups") val ingredientGroups: List<AiIngredientGroupDto>,
+    val servingsBase: Int? = null,
+    val prepTimeSeconds: Int? = null,
+    @SerialName("difficultyLevel") val difficulty: Int? = null,
+    val ingredientSections: List<AiIngredientGroupDto>,
     val steps: List<AiStepDto>
 )
 
@@ -22,33 +27,41 @@ class AiParsedRecipeMapper() : Mapper<RecipeDomain, AiParsedRecipeDto> {
             id = "",
             photoUrl = "",
             title = input.title,
-            ingredientGroups = input.ingredientGroups.mapIndexed { groupIndex, groupDto ->
-                IngredientGroupDomain(
+            ingredientSections = input.ingredientSections.map { groupDto ->
+                IngredientSectionDomain(
                     id = "",
                     recipeId = "",
                     name = groupDto.name.orEmpty(),
-                    order = groupIndex,
-                    ingredients = groupDto.ingredients.mapIndexed { ingredientIndex, ingredientDto ->
-                        IngredientDomain(
+                    sortOrder = groupDto.sortOrder,
+                    ingredients = groupDto.ingredients.map { ingredientDto ->
+                        RecipeIngredientDomain(
                             id = "",
-                            groupId = "",
+                            sectionId = "",
                             name = ingredientDto.name,
                             quantity = ingredientDto.quantity,
                             unit = ingredientDto.unit,
-                            order = ingredientIndex
+                            note = ingredientDto.note,
+                            sortOrder = ingredientDto.sortOrder
                         )
                     }
                 )
             },
-            steps = input.steps.mapIndexed { index, stepDto ->
+            steps = input.steps.map { stepDto ->
                 RecipeStepDomain(
                     id = "",
                     recipeId = "",
-                    order = index,
-                    description = stepDto.description,
-                    durationMinutes = stepDto.durationMinutes
+                    instructions = stepDto.instructionText,
+                    timerSeconds = stepDto.timerSeconds,
+                    cookTimeSeconds = stepDto.cookTimeSeconds,
+                    cookTemperature = stepDto.cookTemperature,
+                    sortOrder = stepDto.sortOrder
                 )
-            }
+            },
+            sourceUrl = null,
+            sourceType = RecipeSourceType.Photo,
+            prepTimeSeconds = input.prepTimeSeconds,
+            servingsBase = input.servingsBase ?: 1,
+            difficulty = RecipeDifficulty.fromValue(input.difficulty)
         )
     }
 }

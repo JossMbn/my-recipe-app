@@ -22,8 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientDomain
-import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientGroupDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientSectionDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeIngredientDomain
 import com.jmabilon.myrecipeapp.ui.recipe.details.sheet.component.CheckIngredientItem
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -32,7 +32,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun CheckIngredientsAvailabilitySheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-    ingredientGroups: List<IngredientGroupDomain>,
+    ingredientGroups: List<IngredientSectionDomain>,
     onDismissRequest: () -> Unit
 ) {
     ModalBottomSheet(
@@ -50,7 +50,7 @@ fun CheckIngredientsAvailabilitySheet(
 @Composable
 private fun ColumnScope.CheckIngredientsAvailabilitySheetContent(
     modifier: Modifier = Modifier,
-    ingredientGroups: List<IngredientGroupDomain>,
+    ingredientGroups: List<IngredientSectionDomain>,
 ) {
     val checkedIngredients = remember { mutableStateListOf<String>() }
 
@@ -120,59 +120,64 @@ private fun CheckIngredientsAvailabilitySheetContentPreview() {
     ) {
         CheckIngredientsAvailabilitySheetContent(
             ingredientGroups = listOf(
-                IngredientGroupDomain(
+                IngredientSectionDomain(
                     id = "group1",
                     recipeId = "1",
                     name = "For the batter",
-                    order = 0,
+                    sortOrder = 0,
                     ingredients = listOf(
-                        IngredientDomain(
+                        RecipeIngredientDomain(
                             id = "ing1",
                             name = "All-purpose flour",
-                            quantity = "1 1/2 cups",
-                            groupId = "group1",
-                            unit = null,
-                            order = 0,
+                            quantity = 0.5,
+                            sectionId = "group1",
+                            unit = "cup",
+                            note = null,
+                            sortOrder = 0,
                         ),
-                        IngredientDomain(
+                        RecipeIngredientDomain(
                             id = "ing2",
                             name = "Sugar",
-                            quantity = "2 tablespoons",
-                            groupId = "group1",
-                            unit = null,
-                            order = 1
+                            quantity = 2.0,
+                            sectionId = "group1",
+                            unit = "tbsp",
+                            note = null,
+                            sortOrder = 1
                         ),
-                        IngredientDomain(
+                        RecipeIngredientDomain(
                             id = "ing3",
                             name = "Baking powder",
-                            quantity = "2 teaspoons",
-                            groupId = "group1",
-                            unit = null,
-                            order = 2
+                            quantity = 2.0,
+                            sectionId = "group1",
+                            unit = "tsp",
+                            note = null,
+                            sortOrder = 2
                         )
                     )
                 ),
-                IngredientGroupDomain(
+                IngredientSectionDomain(
                     id = "group2",
                     recipeId = "1",
                     name = "For the toppings",
-                    order = 1,
+                    sortOrder = 1,
                     ingredients = listOf(
-                        IngredientDomain(
+                        RecipeIngredientDomain(
                             id = "ing4",
                             name = "Maple syrup",
-                            quantity = "To taste",
-                            groupId = "group2",
+                            quantity = 1.0,
+                            sectionId = "group2",
                             unit = null,
-                            order = 0
+                            note = null,
+                            sortOrder = 0
                         ),
-                        IngredientDomain(
+                        RecipeIngredientDomain(
                             id = "ing5",
                             name = "Fresh berries",
-                            quantity = "To taste",
-                            groupId = "group2",
+                            quantity = 1.0,
+                            sectionId = "group2",
                             unit = null,
-                            order = 1
+                            note = null,
+                            sortOrder = 1
                         )
                     )
                 )

@@ -25,7 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.jmabilon.myrecipeapp.domain.recipe.model.IngredientDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeIngredientDomain
 import myrecipeapp.composeapp.generated.resources.Res
 import myrecipeapp.composeapp.generated.resources.ic_close_rounded
 import org.jetbrains.compose.resources.painterResource
@@ -35,7 +35,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun IngredientGroupContainer(
     modifier: Modifier = Modifier,
     groupTitle: String,
-    ingredients: List<IngredientDomain>,
+    ingredients: List<RecipeIngredientDomain>,
     onAddIngredientsClick: () -> Unit,
     onRemoveIngredientClick: (ingredientId: String, groupId: String) -> Unit
 ) {
@@ -103,7 +103,7 @@ fun IngredientGroupContainer(
                     IconButton(onClick = {
                         onRemoveIngredientClick(
                             ingredient.id,
-                            ingredient.groupId
+                            ingredient.sectionId
                         )
                     }) {
                         Icon(
@@ -141,29 +141,32 @@ private fun IngredientGroupContainerPreview() {
                 .padding(10.dp),
             groupTitle = "For Cheese Cake",
             ingredients = listOf(
-                IngredientDomain(
+                RecipeIngredientDomain(
                     id = "1",
-                    groupId = "g1",
+                    sectionId = "g1",
                     name = "Onion",
-                    quantity = "1 cup",
-                    unit = null,
-                    order = 0
+                    quantity = 1.0,
+                    unit = "cup",
+                    note = null,
+                    sortOrder = 0
                 ),
-                IngredientDomain(
+                RecipeIngredientDomain(
                     id = "2",
-                    groupId = "g1",
+                    sectionId = "g1",
                     name = "sugar",
-                    quantity = "50",
+                    quantity = 50.0,
                     unit = "g",
-                    order = 1
+                    note = null,
+                    sortOrder = 1
                 ),
-                IngredientDomain(
+                RecipeIngredientDomain(
                     id = "3",
-                    groupId = "g1",
+                    sectionId = "g1",
                     name = "flour",
-                    quantity = "200",
+                    quantity = 200.0,
                     unit = "g",
-                    order = 2
+                    note = null,
+                    sortOrder = 2
                 )
             ),
             onAddIngredientsClick = { /* no-op */ },

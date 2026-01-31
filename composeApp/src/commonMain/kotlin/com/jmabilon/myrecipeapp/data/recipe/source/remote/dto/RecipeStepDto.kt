@@ -9,9 +9,11 @@ import kotlinx.serialization.Serializable
 data class RecipeStepDto(
     val id: String,
     @SerialName("recipe_id") val recipeId: String,
-    val order: Int, // Position dans la séquence
-    val description: String,
-    @SerialName("duration_minutes") val durationMinutes: Int? // Durée optionnelle de l'étape
+    @SerialName("instruction_text") val instructionText: String,
+    @SerialName("timer_seconds") val timerSeconds: Int?, // Durée en secondes (optionnelle)
+    @SerialName("cook_time_seconds") val cookTimeSeconds: Int?, // Temps de cuisson en secondes (optionnelle)
+    @SerialName("cook_temperature") val cookTemperature: Int?, // Température de cuisson (optionnelle)
+    @SerialName("sort_order") val sortOrder: Int // Position dans la séquence
 )
 
 class RecipeStepMapper : Mapper<RecipeStepDomain, RecipeStepDto> {
@@ -20,9 +22,11 @@ class RecipeStepMapper : Mapper<RecipeStepDomain, RecipeStepDto> {
         return RecipeStepDomain(
             id = input.id,
             recipeId = input.recipeId,
-            order = input.order,
-            description = input.description,
-            durationMinutes = input.durationMinutes
+            instructions = input.instructionText,
+            timerSeconds = input.timerSeconds,
+            cookTimeSeconds = input.cookTimeSeconds,
+            cookTemperature = input.cookTemperature,
+            sortOrder = input.sortOrder
         )
     }
 }

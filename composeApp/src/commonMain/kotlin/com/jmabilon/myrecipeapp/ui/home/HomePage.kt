@@ -3,30 +3,42 @@ package com.jmabilon.myrecipeapp.ui.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.tappableElement
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDifficulty
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeSourceType
+import com.jmabilon.myrecipeapp.ui.home.component.HomeCollectionItem
 import com.jmabilon.myrecipeapp.ui.home.component.HomeRecipeItem
 import com.jmabilon.myrecipeapp.ui.home.model.HomeAction
 import com.jmabilon.myrecipeapp.ui.home.model.HomeState
@@ -64,6 +76,11 @@ private fun HomePage(
                         text = "Home",
                         style = MaterialTheme.typography.headlineSmall
                     )
+                },
+                actions = {
+                    IconButton(onClick = { navigator.navigateToSearchPage() }) {
+                        Text(text = "⋮")
+                    }
                 }
             )
         },
@@ -73,6 +90,15 @@ private fun HomePage(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 horizontalAlignment = Alignment.End
             ) {
+                FloatingActionButton(
+                    onClick = navigator::navigateToSearchPage
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                        text = "Search"
+                    )
+                }
+
                 FloatingActionButton(
                     onClick = navigator::navigateToRecipeAnalyzerPage
                 ) {
@@ -111,24 +137,73 @@ private fun HomePageContent(
     onAction: (HomeAction) -> Unit,
     navigator: HomeNavigator
 ) {
-    LazyVerticalGrid(
-        modifier = modifier.fillMaxSize(),
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(
-            start = contentPadding.calculateStartPadding(LayoutDirection.Ltr) + 16.dp,
-            end = contentPadding.calculateEndPadding(LayoutDirection.Ltr) + 16.dp,
-            top = contentPadding.calculateTopPadding() + 16.dp,
-            bottom = contentPadding.calculateBottomPadding() + 72.dp
-        ),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    val collectionCreationText = remember { mutableStateOf("") }
+
+    Column(
+        modifier = modifier.fillMaxSize()
+            .padding(
+                start = contentPadding.calculateStartPadding(LayoutDirection.Ltr),
+                end = contentPadding.calculateEndPadding(LayoutDirection.Ltr),
+                top = contentPadding.calculateTopPadding()
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(state.recipes) { recipe ->
-            HomeRecipeItem(
-                title = recipe.title,
-                photoUrl = recipe.photoUrl,
-                onClick = { navigator.navigateToRecipeDetailPage(recipe.id) }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                value = collectionCreationText.value,
+                onValueChange = { collectionCreationText.value = it },
+                label = { Text("Create New Collection") }
             )
+
+            Button(
+                onClick = {
+                    onAction(HomeAction.CreateRecipeCollection(collectionCreationText.value))
+                    collectionCreationText.value = ""
+                }
+            ) { Text("Create") }
+        }
+
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(state.recipeCollections) { recipeCollection ->
+                HomeCollectionItem(
+                    firstUrl = recipeCollection.previewImages.getOrNull(0),
+                    secondUrl = recipeCollection.previewImages.getOrNull(1),
+                    thirdUrl = recipeCollection.previewImages.getOrNull(2),
+                    collectionName = recipeCollection.name,
+                    recipeCount = recipeCollection.recipeCount,
+                )
+            }
+        }
+
+        LazyVerticalGrid(
+            modifier = modifier.fillMaxSize(),
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = 16.dp,
+                bottom = contentPadding.calculateBottomPadding() + 16.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(state.recipes) { recipe ->
+                HomeRecipeItem(
+                    title = recipe.title,
+                    photoUrl = recipe.photoUrl,
+                    onClick = { navigator.navigateToRecipeDetailPage(recipe.id) }
+                )
+            }
         }
     }
 }
@@ -144,36 +219,61 @@ private fun HomePagePreview() {
                         id = "1",
                         title = "Spaghetti Bolognese",
                         photoUrl = null,
-                        ingredientGroups = emptyList(),
-                        steps = emptyList()
+                        ingredientSections = emptyList(),
+                        steps = emptyList(),
+                        sourceUrl = null,
+                        sourceType = RecipeSourceType.Manual,
+                        prepTimeSeconds = 0,
+                        servingsBase = 4,
+                        difficulty = RecipeDifficulty.Medium
                     ),
                     RecipeDomain(
                         id = "2",
                         title = "Chicken Curry",
                         photoUrl = null,
-                        ingredientGroups = emptyList(),
-                        steps = emptyList()
+                        ingredientSections = emptyList(),
+                        steps = emptyList(),
+                        sourceUrl = null,
+                        sourceType = RecipeSourceType.Manual,
+                        prepTimeSeconds = 0,
+                        servingsBase = 4,
+                        difficulty = RecipeDifficulty.Medium
                     ),
                     RecipeDomain(
                         id = "3",
                         title = "Vegetable Stir Fry",
                         photoUrl = null,
-                        ingredientGroups = emptyList(),
-                        steps = emptyList()
+                        ingredientSections = emptyList(),
+                        steps = emptyList(),
+                        sourceUrl = null,
+                        sourceType = RecipeSourceType.Manual,
+                        prepTimeSeconds = 0,
+                        servingsBase = 4,
+                        difficulty = RecipeDifficulty.Medium
                     ),
                     RecipeDomain(
                         id = "4",
                         title = "Beef Tacos",
                         photoUrl = null,
-                        ingredientGroups = emptyList(),
-                        steps = emptyList()
+                        ingredientSections = emptyList(),
+                        steps = emptyList(),
+                        sourceUrl = null,
+                        sourceType = RecipeSourceType.Manual,
+                        prepTimeSeconds = 0,
+                        servingsBase = 4,
+                        difficulty = RecipeDifficulty.Medium
                     ),
                     RecipeDomain(
                         id = "5",
                         title = "Caesar Salad",
                         photoUrl = null,
-                        ingredientGroups = emptyList(),
-                        steps = emptyList()
+                        ingredientSections = emptyList(),
+                        steps = emptyList(),
+                        sourceUrl = null,
+                        sourceType = RecipeSourceType.Manual,
+                        prepTimeSeconds = 0,
+                        servingsBase = 4,
+                        difficulty = RecipeDifficulty.Medium
                     )
                 )
             ),

@@ -1,13 +1,10 @@
-package com.jmabilon.myrecipeapp.ui.home
+package com.jmabilon.myrecipeapp.ui.search
 
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.jmabilon.myrecipeapp.ui.ai.AiAnalyzerRoute
-import com.jmabilon.myrecipeapp.ui.recipe.creation.RecipeCreationRoute
 import com.jmabilon.myrecipeapp.ui.recipe.details.RecipeDetailsRoute
-import com.jmabilon.myrecipeapp.ui.search.SearchRoute
 import kotlinx.serialization.Serializable
 
 // ==================================================================================
@@ -15,38 +12,28 @@ import kotlinx.serialization.Serializable
 // ==================================================================================
 
 @Serializable
-data object HomeRoute
+data object SearchRoute
 
 // ==================================================================================
 //  Navigator
 // ==================================================================================
 
 @Stable
-interface HomeNavigator {
+interface SearchNavigator {
+    fun navigateBack()
     fun navigateToRecipeDetailPage(recipeId: String)
-    fun navigateToRecipeCreationPage()
-    fun navigateToRecipeAnalyzerPage()
-    fun navigateToSearchPage()
 }
 
-class HomeNavigatorImpl(
+class SearchNavigatorImpl(
     private val controller: NavController? = null
-) : HomeNavigator {
+) : SearchNavigator {
+
+    override fun navigateBack() {
+        controller?.navigateUp()
+    }
 
     override fun navigateToRecipeDetailPage(recipeId: String) {
         controller?.navigate(RecipeDetailsRoute(recipeId = recipeId))
-    }
-
-    override fun navigateToRecipeCreationPage() {
-        controller?.navigate(RecipeCreationRoute())
-    }
-
-    override fun navigateToRecipeAnalyzerPage() {
-        controller?.navigate(AiAnalyzerRoute)
-    }
-
-    override fun navigateToSearchPage() {
-        controller?.navigate(SearchRoute)
     }
 }
 
@@ -54,10 +41,10 @@ class HomeNavigatorImpl(
 //  Graph extension
 // ==================================================================================
 
-fun NavGraphBuilder.homePage(
+fun NavGraphBuilder.searchPage(
     controller: NavController
 ) {
-    composable<HomeRoute> {
-        HomeRoot(navigator = HomeNavigatorImpl(controller = controller))
+    composable<SearchRoute> {
+        SearchRoot(navigator = SearchNavigatorImpl(controller = controller))
     }
 }

@@ -7,6 +7,7 @@ sealed interface RecipeCreationAction {
     // Step 1
     data class OnRecipeTitleChange(val title: String) : RecipeCreationAction
     data class OnRecipeImagePicked(val imageBytes: List<Byte>?) : RecipeCreationAction
+    data class OnSelectRecipeCollection(val collectionId: String) : RecipeCreationAction
     data object OnValidateFirstStep : RecipeCreationAction
 
     // Step 2

@@ -19,6 +19,7 @@ import com.jmabilon.myrecipeapp.ui.home.HomeRoute
 import com.jmabilon.myrecipeapp.ui.home.homePage
 import com.jmabilon.myrecipeapp.ui.recipe.creation.recipeCreationPage
 import com.jmabilon.myrecipeapp.ui.recipe.details.recipeDetailsPage
+import com.jmabilon.myrecipeapp.ui.search.searchPage
 import io.github.jan.supabase.auth.status.SessionStatus
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -64,6 +65,7 @@ private fun MainContent() {
             recipeCreationPage(controller = controller)
             recipeDetailsPage(controller = controller)
             aiAnalyzerPage(controller = controller)
+            searchPage(controller = controller)
         }
     }
 }

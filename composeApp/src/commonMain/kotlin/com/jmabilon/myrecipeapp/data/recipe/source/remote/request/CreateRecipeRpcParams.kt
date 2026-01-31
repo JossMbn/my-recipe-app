@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateRecipeRpcParams(
-    @SerialName("recipe_data") val recipeData: CreateRecipeRequest
+    @SerialName("recipe_data") val recipeData: CreateRecipeRequest,
+    @SerialName("target_folder_id") val collectionId: String?
 )
