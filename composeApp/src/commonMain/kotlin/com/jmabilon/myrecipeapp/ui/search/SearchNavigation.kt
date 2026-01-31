@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.jmabilon.myrecipeapp.ui.recipe.details.RecipeDetailsRoute
 import kotlinx.serialization.Serializable
 
 // ==================================================================================
@@ -20,6 +21,7 @@ data object SearchRoute
 @Stable
 interface SearchNavigator {
     fun navigateBack()
+    fun navigateToRecipeDetailPage(recipeId: String)
 }
 
 class SearchNavigatorImpl(
@@ -28,6 +30,10 @@ class SearchNavigatorImpl(
 
     override fun navigateBack() {
         controller?.navigateUp()
+    }
+
+    override fun navigateToRecipeDetailPage(recipeId: String) {
+        controller?.navigate(RecipeDetailsRoute(recipeId = recipeId))
     }
 }
 

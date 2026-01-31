@@ -23,4 +23,6 @@ interface RecipeRepository {
     suspend fun getCollectionRecipes(collectionId: String): Result<List<RecipeDomain>>
 
     suspend fun getUncategorizedCollectionRecipes(): Result<List<RecipeDomain>>
+
+    suspend fun searchRecipes(query: String): Result<List<RecipeDomain>>
 }

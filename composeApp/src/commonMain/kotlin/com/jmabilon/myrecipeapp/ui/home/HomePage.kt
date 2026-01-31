@@ -91,6 +91,15 @@ private fun HomePage(
                 horizontalAlignment = Alignment.End
             ) {
                 FloatingActionButton(
+                    onClick = navigator::navigateToSearchPage
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                        text = "Search"
+                    )
+                }
+
+                FloatingActionButton(
                     onClick = navigator::navigateToRecipeAnalyzerPage
                 ) {
                     Text(

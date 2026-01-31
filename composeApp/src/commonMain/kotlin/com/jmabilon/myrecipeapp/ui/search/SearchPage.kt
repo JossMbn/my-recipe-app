@@ -2,14 +2,19 @@ package com.jmabilon.myrecipeapp.ui.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jmabilon.myrecipeapp.ui.home.component.HomeRecipeItem
 import com.jmabilon.myrecipeapp.ui.search.model.SearchAction
 import com.jmabilon.myrecipeapp.ui.search.model.SearchState
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -94,7 +100,7 @@ private fun SearchPage(
         }
     ) { innerPadding ->
         SearchPageContent(
-            modifier = Modifier.padding(innerPadding),
+            contentPadding = innerPadding,
             state = state,
             onAction = onAction,
             navigator = navigator
@@ -105,27 +111,30 @@ private fun SearchPage(
 @Composable
 private fun SearchPageContent(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues,
     state: SearchState,
     onAction: (SearchAction) -> Unit,
     navigator: SearchNavigator
 ) {
-    Column {
-
-        /*Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .clip(shape = searchBarShape)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = searchBarShape
-                )
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .padding(12.dp),
-            text = "search bar placeholder"
-        )*/
+    LazyVerticalGrid(
+        modifier = modifier.fillMaxSize(),
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            top = contentPadding.calculateTopPadding() + 16.dp,
+            end = 16.dp,
+            bottom = contentPadding.calculateBottomPadding() + 16.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(state.recipes) { recipe ->
+            HomeRecipeItem(
+                title = recipe.title,
+                photoUrl = recipe.photoUrl,
+                onClick = { navigator.navigateToRecipeDetailPage(recipe.id) }
+            )
+        }
     }
 }
 

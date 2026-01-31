@@ -125,4 +125,14 @@ class RecipeRepositoryImpl(
                 .decodeListAndMap(RecipeMapper())
         }
     }
+
+    override suspend fun searchRecipes(query: String): Result<List<RecipeDomain>> {
+        return supabaseClient.safeExecution {
+            postgrest.rpc(
+                function = "search_recipes",
+                parameters = mapOf("search_query" to query)
+            )
+                .decodeListAndMap(RecipeMapper())
+        }
+    }
 }
