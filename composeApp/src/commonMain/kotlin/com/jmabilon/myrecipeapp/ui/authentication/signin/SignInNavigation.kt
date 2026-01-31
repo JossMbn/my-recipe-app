@@ -1,5 +1,6 @@
 package com.jmabilon.myrecipeapp.ui.authentication.signin
 
+import androidx.compose.runtime.Stable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -17,6 +18,7 @@ data object SignInRoute
 //  Navigator
 // ==================================================================================
 
+@Stable
 interface SignInNavigator {
     fun navigateToSignUp()
 }

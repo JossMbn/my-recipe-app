@@ -6,5 +6,6 @@ data class RecipeCollectionDomain(
     val recipeCount: Int,
     val color: String? = null,
     val previewImages: List<String> = emptyList(),
-    val isUncategorized: Boolean = false
+    val isUncategorized: Boolean = false,
+    val isFavorite: Boolean = false
 )

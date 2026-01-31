@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jmabilon.myrecipeapp.ui.home.component.HomeRecipeItem
 import com.jmabilon.myrecipeapp.ui.search.model.SearchAction
 import com.jmabilon.myrecipeapp.ui.search.model.SearchState
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -129,11 +128,11 @@ private fun SearchPageContent(
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         items(state.recipes) { recipe ->
-            HomeRecipeItem(
+            /*HomeRecipeItem(
                 title = recipe.title,
                 photoUrl = recipe.photoUrl,
                 onClick = { navigator.navigateToRecipeDetailPage(recipe.id) }
-            )
+            )*/
         }
     }
 }

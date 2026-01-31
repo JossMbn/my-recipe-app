@@ -12,5 +12,7 @@ enum class HomeContentView {
 data class HomeState(
     val contentView: HomeContentView = HomeContentView.Loading,
     val recipes: ImmutableList<RecipeDomain> = persistentListOf(),
-    val recipeCollections: ImmutableList<RecipeCollectionDomain> = persistentListOf()
+    val recipeCollections: ImmutableList<RecipeCollectionDomain> = persistentListOf(),
+    val uncategorizedCollection: RecipeCollectionDomain? = null,
+    val favoriteCollection: RecipeCollectionDomain? = null
 )

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -24,13 +25,32 @@ class HomeViewModel(
     val event = _event.asSharedFlow()
 
     private val _recipes = recipeRepository.recipes
-    private val _recipeCollections = recipeRepository.recipeCollections
+    private val _allCollections = recipeRepository.recipeCollections
+    private val _filteredCollections =
+        _allCollections.map { collections ->
+            collections.filter { !it.isUncategorized && !it.isFavorite }
+        }
+    private val _uncategorizedCollection =
+        _allCollections.map { collections ->
+            collections.firstOrNull { it.isUncategorized }
+        }
+    private val _favoriteCollection =
+        _allCollections.map { collections ->
+            collections.firstOrNull { it.isFavorite }
+        }
 
-    val state = _recipes.combine(_recipeCollections) { recipes, recipeCollections ->
+    val state = combine(
+        _recipes,
+        _filteredCollections,
+        _uncategorizedCollection,
+        _favoriteCollection
+    ) { recipes, filteredCollections, uncategorizedCollection, favoriteCollection ->
         HomeState(
             contentView = HomeContentView.Content,
             recipes = recipes.toPersistentList(),
-            recipeCollections = recipeCollections.toPersistentList()
+            recipeCollections = filteredCollections.toPersistentList(),
+            uncategorizedCollection = uncategorizedCollection,
+            favoriteCollection = favoriteCollection
         )
     }
         .onStart {

@@ -2,10 +2,7 @@ package com.jmabilon.myrecipeapp
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -13,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.jmabilon.myrecipeapp.designsystem.theme.MyRecipeAppTheme
 import com.jmabilon.myrecipeapp.ui.ai.aiAnalyzerPage
 import com.jmabilon.myrecipeapp.ui.authentication.AuthenticationNavHost
 import com.jmabilon.myrecipeapp.ui.home.HomeRoute
@@ -30,7 +28,7 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
 
     val authStatus by viewModel.authenticationStatus.collectAsStateWithLifecycle()
 
-    MaterialTheme {
+    MyRecipeAppTheme {
         AnimatedContent(
             modifier = Modifier.fillMaxSize(), targetState = authStatus
         ) { targetState ->
@@ -54,10 +52,7 @@ private fun MainContent() {
         contentWindowInsets = WindowInsets()
     ) { innerPadding ->
         NavHost(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding),
+            modifier = Modifier.fillMaxSize(),
             navController = controller,
             startDestination = HomeRoute
         ) {

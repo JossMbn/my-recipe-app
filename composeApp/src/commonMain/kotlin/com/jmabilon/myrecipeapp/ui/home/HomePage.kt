@@ -1,45 +1,38 @@
 package com.jmabilon.myrecipeapp.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.tappableElement
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jmabilon.myrecipeapp.designsystem.extension.horizontalNegativePadding
+import com.jmabilon.myrecipeapp.designsystem.theme.MyRecipeAppTheme
+import com.jmabilon.myrecipeapp.designsystem.theme.backgroundBrush
+import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeCollectionDomain
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDifficulty
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeDomain
 import com.jmabilon.myrecipeapp.domain.recipe.model.RecipeSourceType
 import com.jmabilon.myrecipeapp.ui.home.component.HomeCollectionItem
-import com.jmabilon.myrecipeapp.ui.home.component.HomeRecipeItem
+import com.jmabilon.myrecipeapp.ui.home.component.HomeSectionContainer
 import com.jmabilon.myrecipeapp.ui.home.model.HomeAction
 import com.jmabilon.myrecipeapp.ui.home.model.HomeState
 import kotlinx.collections.immutable.persistentListOf
@@ -69,7 +62,7 @@ private fun HomePage(
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = {
+        /*topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
@@ -83,8 +76,8 @@ private fun HomePage(
                     }
                 }
             )
-        },
-        floatingActionButton = {
+        },*/
+        /*floatingActionButton = {
             Column(
                 modifier = Modifier.windowInsetsPadding(WindowInsets.tappableElement),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -117,12 +110,16 @@ private fun HomePage(
                     )
                 }
             }
-        }
+        }*/
     ) { innerPadding ->
         HomePageContent(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = innerPadding,
             state = state,
+            contentPadding = PaddingValues(
+                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 20.dp,
+                top = innerPadding.calculateTopPadding() + 30.dp,
+                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 20.dp,
+                bottom = innerPadding.calculateBottomPadding() + 30.dp
+            ),
             onAction = onAction,
             navigator = navigator
         )
@@ -131,78 +128,84 @@ private fun HomePage(
 
 @Composable
 private fun HomePageContent(
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues,
     state: HomeState,
+    contentPadding: PaddingValues,
     onAction: (HomeAction) -> Unit,
     navigator: HomeNavigator
 ) {
-    val collectionCreationText = remember { mutableStateOf("") }
-
-    Column(
-        modifier = modifier.fillMaxSize()
-            .padding(
-                start = contentPadding.calculateStartPadding(LayoutDirection.Ltr),
-                end = contentPadding.calculateEndPadding(LayoutDirection.Ltr),
-                top = contentPadding.calculateTopPadding()
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.backgroundBrush),
+        contentPadding = contentPadding,
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                value = collectionCreationText.value,
-                onValueChange = { collectionCreationText.value = it },
-                label = { Text("Create New Collection") }
+        item {
+            Text(
+                text = "Good Morning !",
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onBackground
             )
-
-            Button(
-                onClick = {
-                    onAction(HomeAction.CreateRecipeCollection(collectionCreationText.value))
-                    collectionCreationText.value = ""
-                }
-            ) { Text("Create") }
         }
 
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(state.recipeCollections) { recipeCollection ->
-                HomeCollectionItem(
-                    firstUrl = recipeCollection.previewImages.getOrNull(0),
-                    secondUrl = recipeCollection.previewImages.getOrNull(1),
-                    thirdUrl = recipeCollection.previewImages.getOrNull(2),
-                    collectionName = recipeCollection.name,
-                    recipeCount = recipeCollection.recipeCount,
-                )
+        if (state.uncategorizedCollection != null || state.favoriteCollection != null) {
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    state.uncategorizedCollection?.let { collection ->
+                        HomeCollectionItem(
+                            modifier = Modifier.weight(1f),
+                            title = collection.name,
+                            itemCount = collection.recipeCount,
+                            isUncategorized = collection.isUncategorized,
+                            isFavorite = collection.isFavorite
+                        )
+                    }
+
+                    state.favoriteCollection?.let { collection ->
+                        HomeCollectionItem(
+                            modifier = Modifier.weight(1f),
+                            title = collection.name,
+                            itemCount = collection.recipeCount,
+                            isUncategorized = collection.isUncategorized,
+                            isFavorite = collection.isFavorite
+                        )
+                    }
+                }
             }
         }
 
-        LazyVerticalGrid(
-            modifier = modifier.fillMaxSize(),
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = 16.dp,
-                bottom = contentPadding.calculateBottomPadding() + 16.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(state.recipes) { recipe ->
-                HomeRecipeItem(
-                    title = recipe.title,
-                    photoUrl = recipe.photoUrl,
-                    onClick = { navigator.navigateToRecipeDetailPage(recipe.id) }
-                )
+        item {
+            HomeSectionContainer(title = "My Collections") {
+                LazyHorizontalGrid(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 300.dp)
+                        .horizontalNegativePadding(20.dp),
+                    rows = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(state.recipeCollections) { collection ->
+                        HomeCollectionItem(
+                            title = collection.name,
+                            itemCount = collection.recipeCount,
+                            isUncategorized = collection.isUncategorized,
+                            isFavorite = collection.isFavorite
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
+            HomeSectionContainer(title = "Recently Added") {
+
             }
         }
     }
@@ -211,7 +214,7 @@ private fun HomePageContent(
 @Preview
 @Composable
 private fun HomePagePreview() {
-    MaterialTheme {
+    MyRecipeAppTheme {
         HomePage(
             state = HomeState(
                 recipes = persistentListOf(
@@ -275,6 +278,40 @@ private fun HomePagePreview() {
                         servingsBase = 4,
                         difficulty = RecipeDifficulty.Medium
                     )
+                ),
+                recipeCollections = persistentListOf(
+                    RecipeCollectionDomain(
+                        id = "c1",
+                        name = "Quick Meals",
+                        recipeCount = 8
+                    ),
+                    RecipeCollectionDomain(
+                        id = "c2",
+                        name = "Healthy Choices",
+                        recipeCount = 15
+                    ),
+                    RecipeCollectionDomain(
+                        id = "c3",
+                        name = "Desserts",
+                        recipeCount = 10
+                    ),
+                    RecipeCollectionDomain(
+                        id = "c4",
+                        name = "Vegetarian",
+                        recipeCount = 20
+                    )
+                ),
+                uncategorizedCollection = RecipeCollectionDomain(
+                    id = "XXXX",
+                    name = "Uncategorized",
+                    recipeCount = 12,
+                    isUncategorized = true
+                ),
+                favoriteCollection = RecipeCollectionDomain(
+                    id = "AAAA",
+                    name = "Favorites",
+                    recipeCount = 24,
+                    isFavorite = true
                 )
             ),
             onAction = { /* no-op */ },

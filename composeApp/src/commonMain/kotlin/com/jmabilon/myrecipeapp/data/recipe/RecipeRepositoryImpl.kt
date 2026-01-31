@@ -91,22 +91,23 @@ class RecipeRepositoryImpl(
     }
 
     override suspend fun createCollection(name: String): Result<Unit> {
-        return supabaseClient.auth.currentUserOrNull()?.id?.let { userId ->
-            val newFolder = mapOf(
-                "user_id" to userId,
-                "name" to name,
-            )
+        val userId = supabaseClient.auth.currentUserOrNull()?.id ?: return Result.failure(
+            Exception("User not authenticated")
+        )
 
-            supabaseClient.safeExecution {
-                postgrest
-                    .from("folders")
-                    .insert(newFolder)
+        val newFolder = mapOf(
+            "user_id" to userId,
+            "name" to name,
+        )
+
+        return supabaseClient.safeExecution {
+            postgrest
+                .from("folders")
+                .insert(newFolder)
+        }
+            .mapCatching {
+                getRecipeCollections()
             }
-                .mapCatching {
-                    getRecipeCollections()
-                    Unit
-                }
-        } ?: Result.failure(Exception("User not authenticated"))
     }
 
     override suspend fun getCollectionRecipes(collectionId: String): Result<List<RecipeDomain>> {
